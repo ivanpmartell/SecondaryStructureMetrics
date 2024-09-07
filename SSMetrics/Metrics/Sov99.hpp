@@ -10,6 +10,7 @@ class Sov99 : public Metric
 private:
     int Delta(const OverlapBlock& overlapBlock);
     int N(const char& secondaryStructure);
+    int N_sum{0};
     std::unordered_map<char, std::vector<SSBlock*>>* nonOverlappingBlocks;
     std::unordered_map<char, int> Normalization;
 public:

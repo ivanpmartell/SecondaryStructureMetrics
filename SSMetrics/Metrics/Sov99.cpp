@@ -36,7 +36,9 @@ Sov99::Sov99(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks, unord
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
         }
-        Normalization.try_emplace(sse, N(sse));
+        int normalizationValue = N(sse);
+        N_sum += normalizationValue;
+        Normalization.try_emplace(sse, normalizationValue);
         this->PartialComputation.try_emplace(sse, summation);
     }
 }
@@ -47,7 +49,7 @@ double Sov99::CalculateAllClasses() {
         char sse = iterBlocksForSSE.first;
         summation += PartialComputation[sse];
     }
-    return summation / GetRefLength();
+    return summation / N_sum;
 }
 
 double Sov99::CalculateOneClass(const char& secondaryStructure) {

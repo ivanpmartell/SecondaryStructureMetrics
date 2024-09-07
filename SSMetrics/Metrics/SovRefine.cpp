@@ -3,20 +3,19 @@
 using namespace std;
 
 double SovRefine::Delta(const OverlapBlock& overlapBlock) {
-    return DeltaAll() * (overlapBlock.refRegion->GetLength() / (double)GetRefLength()) * (OverlapLength(overlapBlock) / (double)overlapBlock.GetLength());
+    double deltaVal = PrecalculatedDeltaAll * (overlapBlock.refRegion->GetLength() / (double)GetRefLength()) * (OverlapLength(overlapBlock) / (double)overlapBlock.GetLength());
+    int threshold = overlapBlock.GetLength() - OverlapLength(overlapBlock);
+    if (deltaVal > threshold) { 
+        return threshold;
+    }
+    return deltaVal;
 }
 
 double SovRefine::DeltaAll()
 {
     double summation = 0;
-
-    for (auto& [sse, sseOverlappingBlocks]: *overlappingBlocks) {
-        for (auto blockPtr : sseOverlappingBlocks) {
-            summation += pow(blockPtr->refRegion->GetLength() / (double)GetRefLength(), 2);
-        }
-    }
-    for (auto& [sse, sseNonOverlappingBlocks]: *nonOverlappingBlocks) {
-        for (auto blockPtr : sseNonOverlappingBlocks) {
+    for (auto& [sse, refSequenceBlocks]: *refBlocks) {
+        for (auto& blockPtr : refSequenceBlocks) {
             summation += pow(blockPtr->GetLength() / (double)GetRefLength(), 2);
         }
     }
@@ -42,20 +41,25 @@ int SovRefine::N(const char& secondaryStructure) {
 
 SovRefine::SovRefine(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks,
     unordered_map<char, vector<SSBlock*>>* nonOverlappingBlocks,
+    unordered_map<char, vector<SSBlock*>>* refBlocks,
     const int& refLength, const int& ssClasses, const double& lambda)
     : Metric(overlappingBlocks, refLength)
 {
     _ssClasses = ssClasses;
     _lambda = lambda;
+    this->refBlocks = refBlocks;
     this->nonOverlappingBlocks = nonOverlappingBlocks;
+    PrecalculatedDeltaAll = DeltaAll();
     for (auto& [sse, sseOverlappingBlocks]: *overlappingBlocks) {
         double summation = 0;
         for (auto blockPtr : sseOverlappingBlocks) {
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
         }
-        Normalization.try_emplace(sse, N(sse));
-        this->PartialComputation.try_emplace(sse, summation);
+        int normalizationValue = N(sse);
+        N_sum += normalizationValue;
+        Normalization.try_emplace(sse, normalizationValue);
+        PartialComputation.try_emplace(sse, summation);
     }
 }
 
@@ -65,7 +69,7 @@ double SovRefine::CalculateAllClasses() {
         char sse = iterBlocksForSSE.first;
         summation += PartialComputation[sse];
     }
-    return summation / GetRefLength();
+    return summation / N_sum;
 }
 
 double SovRefine::CalculateOneClass(const char& secondaryStructure) {

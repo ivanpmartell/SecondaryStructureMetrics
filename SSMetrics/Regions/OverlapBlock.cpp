@@ -89,6 +89,9 @@ pair<unordered_map<char, vector<OverlapBlock*>>,unordered_map<char, vector<SSBlo
             }
             if (predTo < refTo) {
                 ++iterPredBlocksForSSE;
+                if (iterRefBlocksForSSE == refBlocksForSSE.end() || iterPredBlocksForSSE == predBlocksForSSE.end()) {
+                    AddBlockToVectorMap(allNonOverlappingBlocksForSS, sse, currentRefBlock);
+                }
             }
             else {
                 ++iterRefBlocksForSSE;

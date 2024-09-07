@@ -41,27 +41,17 @@ int main(int argc, char **argv) {
     switch (metricEnum) {
         case MetricChoice::All: {
             Accuracy acc = Accuracy(overlappingBlocks, refSequence.length());
+            LooseOverlap looseOverlap = LooseOverlap(overlappingBlocks, refSequence.length());
+            StrictOverlap strictOverlap = StrictOverlap(overlappingBlocks, refSequence.length());
+            Sov94 sov94 = Sov94(overlappingBlocks, refSequence.length(), zeroDelta);
+            Sov99 sov99 = Sov99(overlappingBlocks, nonOverlappingBlocks, refSequence.length());
+            SovRefine sovRefine = SovRefine(overlappingBlocks, nonOverlappingBlocks, &refBlocks, refSequence.length(), refBlocks.size(), lambda);
             for (char const& sse : secondaryStructureClasses) {
                 cout << "Accuracy_i\t" << sse << "\t" << fixed << setprecision(3) << acc.CalculateOneClass(sse) << endl;
-            }
-            LooseOverlap looseOverlap = LooseOverlap(overlappingBlocks, refSequence.length());
-            for (char const& sse : secondaryStructureClasses) {
                 cout << "LooseOverlap_i\t" << sse << "\t" << fixed << setprecision(3) << looseOverlap.CalculateOneClass(sse) << endl;
-            }
-            StrictOverlap strictOverlap = StrictOverlap(overlappingBlocks, refSequence.length());
-            for (char const& sse : secondaryStructureClasses) {
                 cout << "StrictOverlap_i\t" << sse << "\t" << fixed << setprecision(3) << strictOverlap.CalculateOneClass(sse) << endl;
-            }
-            Sov94 sov94 = Sov94(overlappingBlocks, refSequence.length(), zeroDelta);
-            for (char const& sse : secondaryStructureClasses) {
                 cout << "SOV_94_i\t" << sse << "\t" << fixed << setprecision(3) << sov94.CalculateOneClass(sse) << endl;
-            }
-            Sov99 sov99 = Sov99(overlappingBlocks, nonOverlappingBlocks, refSequence.length());
-            for (char const& sse : secondaryStructureClasses) {
                 cout << "SOV_99_i\t" << sse << "\t" << fixed << setprecision(3) << sov99.CalculateOneClass(sse) << endl;
-            }
-            SovRefine sovRefine = SovRefine(overlappingBlocks, nonOverlappingBlocks, refSequence.length(), refBlocks.size(), lambda);
-            for (char const& sse : secondaryStructureClasses) {
                 cout << "SOV_refine_i\t" << sse << "\t" << fixed << setprecision(3) << sovRefine.CalculateOneClass(sse) << endl;
             }
             cout << "Accuracy\t" << fixed << setprecision(3) << acc.CalculateAllClasses() << endl;
@@ -97,7 +87,7 @@ int main(int argc, char **argv) {
             break;
         }
         case MetricChoice::SovRefine: {
-            SovRefine sovRefine = SovRefine(overlappingBlocks, nonOverlappingBlocks, refSequence.length(), refBlocks.size(), lambda);
+            SovRefine sovRefine = SovRefine(overlappingBlocks, nonOverlappingBlocks, &refBlocks, refSequence.length(), refBlocks.size(), lambda);
             for (char const& sse : secondaryStructureClasses) {
                 cout << "SOV_refine_i\t" << sse << "\t" << fixed << setprecision(3) << sovRefine.CalculateOneClass(sse) << endl;
             }
