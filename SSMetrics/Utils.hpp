@@ -8,6 +8,7 @@
 enum class MetricChoice
 {
     Unknown,
+    All,
     Accuracy,
     Sov94,
     Sov99,
@@ -17,7 +18,4 @@ enum class MetricChoice
 };
 
 MetricChoice GetEnumFromString(const std::string& input);
-std::string Trim(const std::string& str);
-std::string PadLeft(const std::string& str, int totalWidth);
-std::string PadRight(const std::string& str, int totalWidth);
 std::string ReadSingleEntryFastaSequence(const std::string& filename);

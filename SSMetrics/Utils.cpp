@@ -3,7 +3,7 @@
 using namespace std;
 
 const unordered_map<string,MetricChoice> strToMetricMap = { {"accuracy",MetricChoice::Accuracy}, {"sov94",MetricChoice::Sov94}, {"sov99", MetricChoice::Sov99},
-        {"sovrefine",MetricChoice::SovRefine}, {"looseoverlap",MetricChoice::LooseOverlap}, {"strictoverlap", MetricChoice::StrictOverlap} };
+    {"sovrefine",MetricChoice::SovRefine}, {"looseoverlap",MetricChoice::LooseOverlap}, {"strictoverlap", MetricChoice::StrictOverlap}, {"all", MetricChoice::All } };
 
 MetricChoice GetEnumFromString(const string& input) {
     auto it = strToMetricMap.find(input);
@@ -13,30 +13,6 @@ MetricChoice GetEnumFromString(const string& input) {
     else { 
         return MetricChoice::Unknown;
     }
-}
-
-string Trim(const string& str)
-{
-    string trimmedStr = str;
-    trimmedStr.erase(trimmedStr.find_last_not_of(' ')+1);
-    trimmedStr.erase(0, trimmedStr.find_first_not_of(' '));
-    return trimmedStr;
-}
-
-string PadLeft(const string& str, int totalWidth)
-{
-    if ( str.size() < totalWidth )
-        return string(totalWidth-str.size(), ' ') + str;
-    else
-        return str;
-}
-
-string PadRight(const string& str, int totalWidth)
-{
-    if ( str.size() < totalWidth )
-        return str + string(totalWidth-str.size(), ' ');
-    else
-        return str;
 }
 
 string ReadSingleEntryFastaSequence(const string& filename) {

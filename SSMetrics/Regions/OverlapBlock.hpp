@@ -8,15 +8,16 @@ class OverlapBlock : public Region
 {
 private:
     int _length{0};
-    std::string PadRegionSequence(const SSBlock& region, const int& from, const int& to);
 public:
-    SSBlock* refRegion;
-    SSBlock* predRegion;
+    const SSBlock* refRegion;
+    const SSBlock* predRegion;
 
     OverlapBlock(const SSBlock& refRegion, const SSBlock& predRegion);
     OverlapBlock() = default;
 
-    const int GetLength();
+    int GetLength() const;
 };
 
-std::pair<std::unordered_map<char, std::vector<OverlapBlock*>>,std::unordered_map<char, std::vector<SSBlock*>>> CalculateOverlappingBlocks(const std::unordered_map<char, SSEsequence*>& refBlocks, const std::unordered_map<char, SSEsequence*>& predBlocks);
+std::pair<std::unordered_map<char, std::vector<OverlapBlock*>>,std::unordered_map<char, std::vector<SSBlock*>>> CalculateOverlappingBlocks(
+    const std::unordered_map<char, std::vector<SSBlock*>>& refBlocks,
+    const std::unordered_map<char, std::vector<SSBlock*>>& predBlocks);

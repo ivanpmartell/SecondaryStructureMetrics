@@ -2,38 +2,26 @@
 
 using namespace std;
 
-SSBlock::SSBlock(int from, int to)
+SSBlock::SSBlock(const int& from, const int& to)
 {
     SetFrom(from);
     SetTo(to);
 }
 
-std::string SSBlock::GetSequence() const {
-    if (Trim(_sequence).length() != GetLength())
-        throw runtime_error("Wrong sequence for region");
-    return _sequence;
-}
-
-void SSBlock::SetSequence(const string& sequence) {
-    if (_sequence.empty())
-        _sequence = sequence;
-}
-
-void AddBlockToVectorMap(unordered_map<char, SSEsequence*>& map, char key, SSBlock* blockPtr)
+void AddBlockToVectorMap(unordered_map<char, vector<SSBlock*>>& map, const char& key, SSBlock* blockPtr)
 {
     if (map.contains(key))
-        map[key]->blocks.push_back(blockPtr);
+        map[key].push_back(blockPtr);
     else
     {
         vector<SSBlock*> blocks = { blockPtr };
-        SSEsequence* elements = new SSEsequence { blocks, 0 };
-        map.try_emplace(key, elements);
+        map.try_emplace(key, blocks);
     }
 }
 
-unordered_map<char, SSEsequence*> GetBlocksForSequence(const string& sequence)
+unordered_map<char, vector<SSBlock*>> GetBlocksForSequence(const string& sequence)
 {
-    unordered_map<char, SSEsequence*> allBlocksForSS;
+    unordered_map<char, vector<SSBlock*>> allBlocksForSS;
     SSBlock* prevBlock;
     for (int i = 0; i < sequence.size(); i++)
     {
@@ -56,15 +44,6 @@ unordered_map<char, SSEsequence*> GetBlocksForSequence(const string& sequence)
                 prevBlock = ssBlock;
                 AddBlockToVectorMap(allBlocksForSS, currentChar, ssBlock);
             }
-        }
-    }
-    for (auto& [key, elements]: allBlocksForSS) {
-
-        for (auto &block : elements->blocks)
-        {  
-            string blockSequence = sequence.substr(block->GetFrom(), block->GetLength());
-            block->SetSequence(blockSequence);
-            elements->size += block->GetLength();
         }
     }
     return allBlocksForSS;

@@ -2,8 +2,7 @@
 
 using namespace std;
 
-Accuracy::Accuracy(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks, int refLength) : Metric(overlappingBlocks) {
-    this->refLength = refLength;
+Accuracy::Accuracy(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks, const int& refLength) : Metric(overlappingBlocks, refLength) {
     for (auto& [sse, sseOverlappingBlocks]: *overlappingBlocks) {
         int summation = 0;
         int refLen = 0;
@@ -12,7 +11,7 @@ Accuracy::Accuracy(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks,
             summation += OverlapLength(block);
             refLen += block.refRegion->GetLength();
         }
-        refLengthForSS.try_emplace(sse, refLen);
+        _refLengthForSS.try_emplace(sse, refLen);
         this->PartialComputation.try_emplace(sse, summation);
     }
 }
@@ -21,7 +20,7 @@ double Accuracy::CalculateAllClasses() {
     double summation = 0;
     for (auto& iterBlocksForSSE: *overlappingBlocks) {
         char sse = iterBlocksForSSE.first;
-        summation += PartialComputation[sse] / refLength;
+        summation += PartialComputation[sse] / GetRefLength();
     }
     return summation;
 }
@@ -31,5 +30,5 @@ double Accuracy::CalculateOneClass(const char& secondaryStructure) {
     if (keyIter == PartialComputation.end()) {
         return 0.0;
     }
-    return PartialComputation[secondaryStructure] / refLengthForSS[secondaryStructure];
+    return keyIter->second / GetSSRefLength(secondaryStructure);
 }

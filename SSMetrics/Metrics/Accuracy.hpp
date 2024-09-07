@@ -3,15 +3,13 @@
 #include <unordered_map>
 #include <vector>
 #include "Interfaces/Metric.hpp"
+#include "Interfaces/SSRefLength.hpp"
 
-class Accuracy : public Metric
+class Accuracy : public Metric, SSRefLength
 {
-private:
-    int refLength{0};
-    std::unordered_map<char, int> refLengthForSS;
 public:
-    Accuracy(std::unordered_map<char,std::vector<OverlapBlock*>>* overlappingBlocks, int refLength);
+    Accuracy(std::unordered_map<char,std::vector<OverlapBlock*>>* overlappingBlocks, const int& refLength);
 
-    double CalculateAllClasses();
-    double CalculateOneClass(const char& secondaryStructure);
+    virtual double CalculateAllClasses();
+    virtual double CalculateOneClass(const char& secondaryStructure);
 };

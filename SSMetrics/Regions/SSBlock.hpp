@@ -5,19 +5,9 @@
 
 class SSBlock : public Region
 {
-private:
-    std::string _sequence{""};
 public:
-    std::string GetSequence() const;
-    void SetSequence(const std::string& sequence);
-    
-    SSBlock(int from, int to);
+    SSBlock(const int& from, const int& to);
     SSBlock() = default;
 };
 
-struct SSEsequence {
-    std::vector<SSBlock*> blocks;
-    int size = 0;
-};
-
-std::unordered_map<char, SSEsequence*> GetBlocksForSequence(const std::string& sequence);
+std::unordered_map<char, std::vector<SSBlock*>> GetBlocksForSequence(const std::string& sequence);

@@ -11,10 +11,10 @@ private:
 
 public:
     int GetTo() const;
-    void SetTo(const int to);
+    void SetTo(const int& to);
 
     int GetFrom() const;
-    void SetFrom(const int from);
+    void SetFrom(const int& from);
 
     int GetLength() const;
 };

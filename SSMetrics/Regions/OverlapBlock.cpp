@@ -15,29 +15,11 @@ OverlapBlock::OverlapBlock(const SSBlock& refRegion, const SSBlock& predRegion)
 
     SetFrom(overlapFrom);
     SetTo(overlapTo);
-    this->refRegion = new SSBlock(refFrom, refTo);
-    this->refRegion->SetSequence(PadRegionSequence(refRegion, overlapFrom, overlapTo));
-    this->predRegion = new SSBlock(predFrom, predTo);
-    this->predRegion->SetSequence(PadRegionSequence(predRegion, overlapFrom, overlapTo));
-    if (this->refRegion->GetSequence().length() != this->predRegion->GetSequence().length())
-        throw runtime_error("Padded regions do not have equal lengths");
+    this->refRegion = &refRegion;
+    this->predRegion = &predRegion;
 }
 
-string OverlapBlock::PadRegionSequence(const SSBlock& region, const int& from, const int& to)
-{
-    string paddedSequence;
-    int padLeftAmount = region.GetFrom() - from;
-    if (padLeftAmount > 0)
-        paddedSequence = PadLeft(region.GetSequence(), region.GetSequence().length() + padLeftAmount);
-    else
-        paddedSequence = region.GetSequence();
-    int padRightAmount = to - region.GetTo();
-    if (padRightAmount > 0)
-        paddedSequence = PadRight(paddedSequence, paddedSequence.length() + padRightAmount);
-    return paddedSequence;
-}
-
-const int OverlapBlock::GetLength() {
+int OverlapBlock::GetLength() const {
     return _length;
 }
 
@@ -64,8 +46,8 @@ void AddBlockToVectorMap(unordered_map<char, vector<SSBlock*>>& map, char key, S
 }
 
 pair<unordered_map<char, vector<OverlapBlock*>>,unordered_map<char, vector<SSBlock*>>> CalculateOverlappingBlocks(
-    const unordered_map<char, SSEsequence*>& refBlocks,
-    const unordered_map<char, SSEsequence*>& predBlocks)
+    const unordered_map<char, vector<SSBlock*>>& refBlocks,
+    const unordered_map<char, vector<SSBlock*>>& predBlocks)
 {
     unordered_map<char, vector<OverlapBlock*>> allOverlappingBlocksForSS;
     unordered_map<char, vector<SSBlock*>> allNonOverlappingBlocksForSS;
@@ -79,30 +61,30 @@ pair<unordered_map<char, vector<OverlapBlock*>>,unordered_map<char, vector<SSBlo
         auto keyIterPred = predBlocks.find(sse);
         if (keyIterPred == predBlocks.end()) {
             //All ref blocks have no overlap
-            for (auto& refBlock : keyIterRef->second->blocks) {
+            for (auto& refBlock : keyIterRef->second) {
                 AddBlockToVectorMap(allNonOverlappingBlocksForSS, sse, refBlock);
             }
             continue;
         }
-        const vector<SSBlock*>& refBlocksForSSE = keyIterRef->second->blocks;
+        const vector<SSBlock*>& refBlocksForSSE = keyIterRef->second;
         auto iterRefBlocksForSSE = refBlocksForSSE.begin();
 
-        const vector<SSBlock*>& predBlocksForSSE = keyIterPred->second->blocks;
+        const vector<SSBlock*>& predBlocksForSSE = keyIterPred->second;
         auto iterPredBlocksForSSE = predBlocksForSSE.begin();
 
         bool hadOverlap = false;
         while (iterRefBlocksForSSE != refBlocksForSSE.end() && iterPredBlocksForSSE != predBlocksForSSE.end())
         {
-            SSBlock currentRefBlock = **iterRefBlocksForSSE;
-            SSBlock currentPredBlock = **iterPredBlocksForSSE;
-            int predFrom = currentPredBlock.GetFrom();
-            int predTo = currentPredBlock.GetTo();
-            int refFrom = currentRefBlock.GetFrom();
-            int refTo = currentRefBlock.GetTo();
+            auto currentRefBlock = *iterRefBlocksForSSE;
+            auto currentPredBlock = *iterPredBlocksForSSE;
+            int predFrom = currentPredBlock->GetFrom();
+            int predTo = currentPredBlock->GetTo();
+            int refFrom = currentRefBlock->GetFrom();
+            int refTo = currentRefBlock->GetTo();
 
             if (predFrom <= refTo && refFrom <= predTo) {
                 hadOverlap = true;
-                OverlapBlock* overlapBlock = new OverlapBlock(currentRefBlock, currentPredBlock);
+                OverlapBlock* overlapBlock = new OverlapBlock(*currentRefBlock, *currentPredBlock);
                 AddBlockToVectorMap(allOverlappingBlocksForSS, sse, overlapBlock);
             }
             if (predTo < refTo) {
@@ -111,8 +93,9 @@ pair<unordered_map<char, vector<OverlapBlock*>>,unordered_map<char, vector<SSBlo
             else {
                 ++iterRefBlocksForSSE;
                 if (!hadOverlap) {
-                    AddBlockToVectorMap(allNonOverlappingBlocksForSS, sse, &currentRefBlock);
+                    AddBlockToVectorMap(allNonOverlappingBlocksForSS, sse, currentRefBlock);
                 }
+                hadOverlap = false;
             }
         }
     }
