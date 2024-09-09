@@ -28,6 +28,7 @@ int Sov99::N(const char& secondaryStructure) {
     return summation;
 }
 
+//TODO: fix for all blocks instead of only overlapping ones (like refine)
 Sov99::Sov99(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks, unordered_map<char, vector<SSBlock*>>* nonOverlappingBlocks, const int& refLength) : Metric(overlappingBlocks, refLength) {
     this->nonOverlappingBlocks = nonOverlappingBlocks;
     for (auto& [sse, sseOverlappingBlocks]: *overlappingBlocks) {

@@ -50,16 +50,23 @@ SovRefine::SovRefine(unordered_map<char,vector<OverlapBlock*>>* overlappingBlock
     this->refBlocks = refBlocks;
     this->nonOverlappingBlocks = nonOverlappingBlocks;
     PrecalculatedDeltaAll = DeltaAll();
-    for (auto& [sse, sseOverlappingBlocks]: *overlappingBlocks) {
-        double summation = 0;
-        for (auto blockPtr : sseOverlappingBlocks) {
-            OverlapBlock overlapBlockPair = *blockPtr;
-            summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
+    for(auto const& kvPairs: *refBlocks)
+    {
+        char sse = kvPairs.first;
+        auto derefOverlappingBlocks = *overlappingBlocks;
+        auto keyIter = derefOverlappingBlocks.find(sse);
+        if (keyIter != derefOverlappingBlocks.end()) {
+            auto sseOverlappingBlocks = keyIter->second;
+            double summation = 0;
+            for (auto blockPtr : sseOverlappingBlocks) {
+                OverlapBlock overlapBlockPair = *blockPtr;
+                summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
+            }
+            PartialComputation.try_emplace(sse, summation);
         }
         int normalizationValue = N(sse);
         N_sum += normalizationValue;
         Normalization.try_emplace(sse, normalizationValue);
-        PartialComputation.try_emplace(sse, summation);
     }
 }
 

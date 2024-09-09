@@ -94,10 +94,10 @@ pair<unordered_map<char, vector<OverlapBlock*>>,unordered_map<char, vector<SSBlo
                 }
             }
             else {
-                ++iterRefBlocksForSSE;
                 if (!hadOverlap) {
                     AddBlockToVectorMap(allNonOverlappingBlocksForSS, sse, currentRefBlock);
                 }
+                ++iterRefBlocksForSSE;
                 hadOverlap = false;
             }
         }
