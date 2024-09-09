@@ -2,6 +2,11 @@
 
 using namespace std;
 
+bool StrictOverlap::GetZeroDelta() const
+{
+    return _zeroDelta;
+}
+
 double StrictOverlap::DeltaSov(const OverlapBlock& overlapBlock) {
     vector<double> choices = {
         static_cast<double>(overlapBlock.GetLength() - OverlapLength(overlapBlock)),
@@ -31,33 +36,30 @@ double StrictOverlap::Theta(const OverlapBlock& overlapBlock)
         return 0;
 }
 
-StrictOverlap::StrictOverlap(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks, const int& refLength) : Metric(overlappingBlocks, refLength) {
-    for (auto& [sse, sseOverlappingBlocks]: *overlappingBlocks) {
+StrictOverlap::StrictOverlap(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta) : Metric(refSequence, predSequence) {
+    this->name = name;
+    this->_zeroDelta = zeroDelta;
+    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         int refLen = 0;
-        for (auto blockPtr : sseOverlappingBlocks) {
+        for (auto blockPtr : GetOverlappingBlocks(secondaryStructure)) {
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += Theta(overlapBlockPair) * overlapBlockPair.refRegion->GetLength();
             refLen += overlapBlockPair.refRegion->GetLength();
         }
-        _refLengthForSS.try_emplace(sse, refLen);
-        this->PartialComputation.try_emplace(sse, summation);
+        this->refLengthSSMap.try_emplace(secondaryStructure, refLen);
+        this->partialComputation.try_emplace(secondaryStructure, summation);
     }
 }
 
 double StrictOverlap::CalculateAllClasses() {
     double summation = 0;
-    for (auto& iterBlocksForSSE: *overlappingBlocks) {
-        char sse = iterBlocksForSSE.first;
-        summation += PartialComputation[sse] / GetRefLength();
+    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
+        summation += GetPartialComputation(secondaryStructure) / GetRefLength();
     }
     return summation;
 }
 
 double StrictOverlap::CalculateOneClass(const char& secondaryStructure) {
-    auto keyIter = PartialComputation.find(secondaryStructure);
-    if (keyIter == PartialComputation.end()) {
-        return 0.0;
-    }
-    return keyIter->second / GetSSRefLength(secondaryStructure);
+    return GetPartialComputation(secondaryStructure) / GetRefLength(secondaryStructure);
 }

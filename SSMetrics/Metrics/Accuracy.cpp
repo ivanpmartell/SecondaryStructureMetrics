@@ -2,33 +2,29 @@
 
 using namespace std;
 
-Accuracy::Accuracy(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks, const int& refLength) : Metric(overlappingBlocks, refLength) {
-    for (auto& [sse, sseOverlappingBlocks]: *overlappingBlocks) {
+Accuracy::Accuracy(const string& name, const string& refSequence, const string& predSequence) : Metric(refSequence, predSequence) {
+    this->name = name;
+    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
         int summation = 0;
         int refLen = 0;
-        for (auto blockPtr : sseOverlappingBlocks) {
+        for (auto blockPtr : GetOverlappingBlocks(secondaryStructure)) {
             OverlapBlock block = *blockPtr;
             summation += OverlapLength(block);
             refLen += block.refRegion->GetLength();
         }
-        _refLengthForSS.try_emplace(sse, refLen);
-        this->PartialComputation.try_emplace(sse, summation);
+        this->refLengthSSMap.try_emplace(secondaryStructure, refLen);
+        this->partialComputation.try_emplace(secondaryStructure, summation);
     }
 }
 
 double Accuracy::CalculateAllClasses() {
     double summation = 0;
-    for (auto& iterBlocksForSSE: *overlappingBlocks) {
-        char sse = iterBlocksForSSE.first;
-        summation += PartialComputation[sse] / GetRefLength();
+    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
+        summation += GetPartialComputation(secondaryStructure) / GetRefLength();
     }
     return summation;
 }
 
 double Accuracy::CalculateOneClass(const char& secondaryStructure) {
-    auto keyIter = PartialComputation.find(secondaryStructure);
-    if (keyIter == PartialComputation.end()) {
-        return 0.0;
-    }
-    return keyIter->second / GetSSRefLength(secondaryStructure);
+    return GetPartialComputation(secondaryStructure) / GetRefLength(secondaryStructure);
 }

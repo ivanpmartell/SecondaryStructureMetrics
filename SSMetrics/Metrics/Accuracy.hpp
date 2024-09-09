@@ -1,15 +1,12 @@
 #pragma once
 
-#include <unordered_map>
-#include <vector>
 #include "Interfaces/Metric.hpp"
-#include "Interfaces/SSRefLength.hpp"
 
-class Accuracy : public Metric, SSRefLength
+class Accuracy : public Metric
 {
 public:
-    Accuracy(std::unordered_map<char,std::vector<OverlapBlock*>>* overlappingBlocks, const int& refLength);
+    Accuracy(const string& name, const string& refSequence, const string& predSequence);
 
-    virtual double CalculateAllClasses();
-    virtual double CalculateOneClass(const char& secondaryStructure);
+    virtual double CalculateAllClasses() override;
+    virtual double CalculateOneClass(const char& secondaryStructure) override;
 };

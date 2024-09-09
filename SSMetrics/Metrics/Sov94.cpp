@@ -2,6 +2,11 @@
 
 using namespace std;
 
+bool Sov94::GetZeroDelta() const
+{
+    return _zeroDelta;
+}
+
 int Sov94::Delta(const OverlapBlock& overlapBlock) {
     if (GetZeroDelta())
         return 0;
@@ -12,39 +17,30 @@ int Sov94::Delta(const OverlapBlock& overlapBlock) {
     return *min_element(choices.begin(), choices.end());
 }
 
-Sov94::Sov94(unordered_map<char,vector<OverlapBlock*>>* overlappingBlocks, const int& refLength, const bool& zeroDelta) : Metric(overlappingBlocks, refLength) {
-    _zeroDelta = zeroDelta;
-    for (auto& [sse, sseOverlappingBlocks]: *overlappingBlocks) {
+Sov94::Sov94(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta) : Metric(refSequence, predSequence) {
+    this->name = name;
+    this->_zeroDelta = zeroDelta;
+    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         int refLen = 0;
-        for (auto blockPtr : sseOverlappingBlocks) {
+        for (auto blockPtr : GetOverlappingBlocks(secondaryStructure)) {
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
             refLen += overlapBlockPair.refRegion->GetLength();
         }
-        _refLengthForSS.try_emplace(sse, refLen);
-        this->PartialComputation.try_emplace(sse, summation);
+        this->refLengthSSMap.try_emplace(secondaryStructure, refLen);
+        this->partialComputation.try_emplace(secondaryStructure, summation);
     }
 }
 
 double Sov94::CalculateAllClasses() {
     double summation = 0;
-    for (auto& iterBlocksForSSE: *overlappingBlocks) {
-        char sse = iterBlocksForSSE.first;
-        summation += PartialComputation[sse] / GetRefLength();
+    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
+        summation += GetPartialComputation(secondaryStructure) / GetRefLength();
     }
     return summation;
 }
 
 double Sov94::CalculateOneClass(const char& secondaryStructure) {
-    auto keyIter = PartialComputation.find(secondaryStructure);
-    if (keyIter == PartialComputation.end()) {
-        return 0.0;
-    }
-    return keyIter->second / GetSSRefLength(secondaryStructure);
-}
-
-bool Sov94::GetZeroDelta()
-{
-    return _zeroDelta;
+    return GetPartialComputation(secondaryStructure) / GetRefLength(secondaryStructure);
 }

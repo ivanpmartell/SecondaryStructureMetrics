@@ -1,19 +1,18 @@
 #pragma once
 
-#include <unordered_map>
-#include <vector>
 #include "Interfaces/Metric.hpp"
-#include "Interfaces/SSRefLength.hpp"
 
-class StrictOverlap : public Metric, SSRefLength
+class StrictOverlap : public Metric
 {
 private:
     bool _zeroDelta{false};
+
+    bool GetZeroDelta() const;
     double DeltaSov(const OverlapBlock& overlapBlock);
     int DeltaStrict(const OverlapBlock& overlapBlock);
     double Theta(const OverlapBlock& overlapBlock);
 public:
-    StrictOverlap(std::unordered_map<char,std::vector<OverlapBlock*>>* overlappingBlocks, const int& refLength);
+    StrictOverlap(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta);
 
     virtual double CalculateAllClasses();
     virtual double CalculateOneClass(const char& secondaryStructure);

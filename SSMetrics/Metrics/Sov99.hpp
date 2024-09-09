@@ -8,13 +8,18 @@
 class Sov99 : public Metric
 {
 private:
+    bool _zeroDelta{false};
+    int _nSum{0};
+    std::unordered_map<char, int> _normalization;
+
+    bool GetZeroDelta() const;
+    int GetNormalizationSum() const;
+    int GetNormalization(const char& secondaryStructure);
+
     int Delta(const OverlapBlock& overlapBlock);
     int N(const char& secondaryStructure);
-    int N_sum{0};
-    std::unordered_map<char, std::vector<SSBlock*>>* nonOverlappingBlocks;
-    std::unordered_map<char, int> Normalization;
 public:
-    Sov99(std::unordered_map<char,std::vector<OverlapBlock*>>* overlappingBlocks, std::unordered_map<char, std::vector<SSBlock*>>* nonOverlappingBlocks, const int& refLength);
+    Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta);
 
     virtual double CalculateAllClasses();
     virtual double CalculateOneClass(const char& secondaryStructure);

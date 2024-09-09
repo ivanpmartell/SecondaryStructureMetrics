@@ -45,7 +45,7 @@ void AddBlockToVectorMap(unordered_map<char, vector<SSBlock*>>& map, char key, S
     }
 }
 
-pair<unordered_map<char, vector<OverlapBlock*>>,unordered_map<char, vector<SSBlock*>>> CalculateOverlappingBlocks(
+pair<unordered_map<char, vector<OverlapBlock*>>, unordered_map<char, vector<SSBlock*>>> CalculateOverlappingBlocks(
     const unordered_map<char, vector<SSBlock*>>& refBlocks,
     const unordered_map<char, vector<SSBlock*>>& predBlocks)
 {

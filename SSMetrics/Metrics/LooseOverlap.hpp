@@ -4,16 +4,13 @@
 #include <vector>
 #include <cmath>
 #include "Interfaces/Metric.hpp"
-#include "Interfaces/SSRefLength.hpp"
 
-class LooseOverlap : public Metric, SSRefLength
+class LooseOverlap : public Metric
 {
 private:
-    bool _zeroDelta{false};
-    double Delta(const OverlapBlock& overlapBlock);
     double Theta(const OverlapBlock& overlapBlock, const char& secondaryStructure);
 public:
-    LooseOverlap(std::unordered_map<char,std::vector<OverlapBlock*>>* overlappingBlocks, const int& refLength);
+    LooseOverlap(const string& name, const string& refSequence, const string& predSequence);
 
     virtual double CalculateAllClasses();
     virtual double CalculateOneClass(const char& secondaryStructure);

@@ -5,14 +5,69 @@
 
 using namespace std;
 
+vector<Metric*> GetMetricsToCalculate(const string& metricName, const string& refSequence, const string& predSequence, const double& lambda, const bool& zeroDelta) {
+    vector<Metric*> metrics;
+    MetricChoice metricEnum = GetEnumFromString(metricName);
+    switch (metricEnum) {
+        case MetricChoice::All: {
+            LooseOverlap* looseOverlap = new LooseOverlap("LooseOverlap", refSequence, predSequence);
+            StrictOverlap* strictOverlap = new StrictOverlap("StrictOverlap", refSequence, predSequence, zeroDelta);
+            Accuracy* accuracy = new Accuracy("Accuracy", refSequence, predSequence);
+            Sov94* sov94 = new Sov94("Sov94", refSequence, predSequence, zeroDelta);
+            Sov99* sov99 = new Sov99("Sov99", refSequence, predSequence, zeroDelta);
+            SovRefine* sovRefine = new SovRefine("SovRefine", refSequence, predSequence, zeroDelta, lambda);
+            metrics.push_back(looseOverlap);
+            metrics.push_back(strictOverlap);
+            metrics.push_back(accuracy);
+            metrics.push_back(sov94);
+            metrics.push_back(sov99);
+            metrics.push_back(sovRefine);
+            break;
+        }
+        case MetricChoice::Accuracy: {
+            Accuracy* accuracy = new Accuracy("Accuracy", refSequence, predSequence);
+            metrics.push_back(accuracy);
+            break;
+        }
+        case MetricChoice::Sov94: {
+            Sov94* sov94 = new Sov94("Sov94", refSequence, predSequence, zeroDelta);
+            metrics.push_back(sov94);
+            break;
+        }
+        case MetricChoice::Sov99: {
+            Sov99* sov99 = new Sov99("Sov99", refSequence, predSequence, zeroDelta);
+            metrics.push_back(sov99);
+            break;
+        }
+        case MetricChoice::SovRefine: {
+            SovRefine* sovRefine = new SovRefine("SovRefine", refSequence, predSequence, zeroDelta, lambda);
+            metrics.push_back(sovRefine);
+            break;
+        }
+        case MetricChoice::LooseOverlap: {
+            LooseOverlap* looseOverlap = new LooseOverlap("LooseOverlap", refSequence, predSequence);
+            metrics.push_back(looseOverlap);
+            break;
+        }
+        case MetricChoice::StrictOverlap: {
+            StrictOverlap* strictOverlap = new StrictOverlap("StrictOverlap", refSequence, predSequence, zeroDelta);
+            metrics.push_back(strictOverlap);
+            break;
+        }
+        default:
+            throw runtime_error("Metric choice is invalid");
+    }
+    return metrics;
+}
+
 int main(int argc, char **argv) {
     CLI::App app{"Secondary structure metric calculator"};
 
-    string metric = "all";
+    string metricName = "all";
     string referencePath, predictedPath;
     double lambda = 1.0;
     bool zeroDelta = false;
-    app.add_option("-m,--metric", metric, "Name of the metric to calculate. Choices: Accuracy, SOV94, SOV99, SOVrefine, FractionalOverlap, LooseOverlap, StrictOverlap");
+    app.add_option("-m,--metric", metricName, "Name of the metric to calculate. Choices: Accuracy, SOV94, SOV99, SOVrefine, FractionalOverlap, LooseOverlap, StrictOverlap");
     app.add_option("-r,--reference", referencePath, "Path to the reference sequence")
         -> required();
     app.add_option("-p,--predicted", predictedPath, "Path to the predicted sequence")
@@ -21,97 +76,17 @@ int main(int argc, char **argv) {
     app.add_flag("-z,--zeroDelta", zeroDelta, "Ignore the delta value (δ = 0)");
     CLI11_PARSE(app, argc, argv);
 
-    transform(metric.begin(), metric.end(), metric.begin(), [](unsigned char c){ return std::tolower(c); });
-    MetricChoice metricEnum = GetEnumFromString(metric);
+    transform(metricName.begin(), metricName.end(), metricName.begin(), [](unsigned char c){ return std::tolower(c); });
 
     string refSequence = ReadSingleEntryFastaSequence(referencePath);
     string predSequence = ReadSingleEntryFastaSequence(predictedPath);
-    unordered_map<char, vector<SSBlock*>> refBlocks = GetBlocksForSequence(refSequence);
-    unordered_map<char, vector<SSBlock*>> predBlocks = GetBlocksForSequence(predSequence);
     
-    auto blockResults = CalculateOverlappingBlocks(refBlocks, predBlocks);
-    unordered_map<char, vector<OverlapBlock*>>* overlappingBlocks = &blockResults.first;
-    unordered_map<char, vector<SSBlock*>>* nonOverlappingBlocks = &blockResults.second;
-
-    vector<char> secondaryStructureClasses;
-    for(auto const& kvPairs: refBlocks)
-        secondaryStructureClasses.push_back(kvPairs.first);
-    
-    unordered_map<MetricChoice, unordered_map<char, double>> results;
-    switch (metricEnum) {
-        case MetricChoice::All: {
-            Accuracy acc = Accuracy(overlappingBlocks, refSequence.length());
-            LooseOverlap looseOverlap = LooseOverlap(overlappingBlocks, refSequence.length());
-            StrictOverlap strictOverlap = StrictOverlap(overlappingBlocks, refSequence.length());
-            Sov94 sov94 = Sov94(overlappingBlocks, refSequence.length(), zeroDelta);
-            Sov99 sov99 = Sov99(overlappingBlocks, nonOverlappingBlocks, refSequence.length());
-            SovRefine sovRefine = SovRefine(overlappingBlocks, nonOverlappingBlocks, &refBlocks, refSequence.length(), refBlocks.size(), lambda);
-            for (char const& sse : secondaryStructureClasses) {
-                cout << "Accuracy_i\t" << sse << "\t" << fixed << setprecision(3) << acc.CalculateOneClass(sse) << endl;
-                cout << "LooseOverlap_i\t" << sse << "\t" << fixed << setprecision(3) << looseOverlap.CalculateOneClass(sse) << endl;
-                cout << "StrictOverlap_i\t" << sse << "\t" << fixed << setprecision(3) << strictOverlap.CalculateOneClass(sse) << endl;
-                cout << "SOV_94_i\t" << sse << "\t" << fixed << setprecision(3) << sov94.CalculateOneClass(sse) << endl;
-                cout << "SOV_99_i\t" << sse << "\t" << fixed << setprecision(3) << sov99.CalculateOneClass(sse) << endl;
-                cout << "SOV_refine_i\t" << sse << "\t" << fixed << setprecision(3) << sovRefine.CalculateOneClass(sse) << endl;
-            }
-            cout << "Accuracy\t" << fixed << setprecision(3) << acc.CalculateAllClasses() << endl;
-            cout << "LooseOverlap\t" << fixed << setprecision(3) << looseOverlap.CalculateAllClasses() << endl;
-            cout << "StrictOverlap\t" << fixed << setprecision(3) << strictOverlap.CalculateAllClasses() << endl;
-            cout << "SOV_94\t" << fixed << setprecision(3) << sov94.CalculateAllClasses() << endl;
-            cout << "SOV_99\t" << fixed << setprecision(3) << sov99.CalculateAllClasses() << endl;
-            cout << "SOV_refine\t" << fixed << setprecision(3) << sovRefine.CalculateAllClasses() << endl;
-            break;
+    vector<Metric*> calculatedMetrics = GetMetricsToCalculate(metricName, refSequence, predSequence, lambda, zeroDelta);
+    for (Metric* metric : calculatedMetrics) {
+        for (char const& secondaryStructure : metric->GetSecondaryStructureClasses()) {
+            cout << metric->name << "_i\t" << secondaryStructure << "\t" << fixed << setprecision(3) << metric->CalculateOneClass(secondaryStructure) << endl;
         }
-        case MetricChoice::Accuracy: {
-            Accuracy acc = Accuracy(overlappingBlocks, refSequence.length());
-            for (char const& sse : secondaryStructureClasses) {
-                cout << "Accuracy_i\t" << sse << "\t" << fixed << setprecision(3) << acc.CalculateOneClass(sse) << endl;
-            }
-            cout << "Accuracy\t" << fixed << setprecision(3) << acc.CalculateAllClasses() << endl;
-            break;
-        }
-        case MetricChoice::Sov94: {
-            Sov94 sov94 = Sov94(overlappingBlocks, refSequence.length(), zeroDelta);
-            for (char const& sse : secondaryStructureClasses) {
-                cout << "SOV_94_i\t" << sse << "\t" << fixed << setprecision(3) << sov94.CalculateOneClass(sse) << endl;
-            }
-            cout << "SOV_94\t" << fixed << setprecision(3) << sov94.CalculateAllClasses() << endl;
-            break;
-        }
-        case MetricChoice::Sov99: {
-            Sov99 sov99 = Sov99(overlappingBlocks, nonOverlappingBlocks, refSequence.length());
-            for (char const& sse : secondaryStructureClasses) {
-                cout << "SOV_99_i\t" << sse << "\t" << fixed << setprecision(3) << sov99.CalculateOneClass(sse) << endl;
-            }
-            cout << "SOV_99\t" << fixed << setprecision(3) << sov99.CalculateAllClasses() << endl;
-            break;
-        }
-        case MetricChoice::SovRefine: {
-            SovRefine sovRefine = SovRefine(overlappingBlocks, nonOverlappingBlocks, &refBlocks, refSequence.length(), refBlocks.size(), lambda);
-            for (char const& sse : secondaryStructureClasses) {
-                cout << "SOV_refine_i\t" << sse << "\t" << fixed << setprecision(3) << sovRefine.CalculateOneClass(sse) << endl;
-            }
-            cout << "SOV_refine\t" << fixed << setprecision(3) << sovRefine.CalculateAllClasses() << endl;
-            break;
-        }
-        case MetricChoice::LooseOverlap: {
-            LooseOverlap looseOverlap = LooseOverlap(overlappingBlocks, refSequence.length());
-            for (char const& sse : secondaryStructureClasses) {
-                cout << "LooseOverlap_i\t" << sse << "\t" << fixed << setprecision(3) << looseOverlap.CalculateOneClass(sse) << endl;
-            }
-            cout << "LooseOverlap\t" << fixed << setprecision(3) << looseOverlap.CalculateAllClasses() << endl;
-            break;
-        }
-        case MetricChoice::StrictOverlap: {
-            StrictOverlap strictOverlap = StrictOverlap(overlappingBlocks, refSequence.length());
-            for (char const& sse : secondaryStructureClasses) {
-                cout << "StrictOverlap_i\t" << sse << "\t" << fixed << setprecision(3) << strictOverlap.CalculateOneClass(sse) << endl;
-            }
-            cout << "StrictOverlap\t" << fixed << setprecision(3) << strictOverlap.CalculateAllClasses() << endl;
-            break;
-        }
-        default:
-            throw runtime_error("Metric choice is invalid");
+        cout << metric->name << "\t" << fixed << setprecision(3) << metric->CalculateAllClasses() << endl;
     }
 
     return 0;

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const unordered_map<string,MetricChoice> strToMetricMap = { {"accuracy",MetricChoice::Accuracy}, {"sov94",MetricChoice::Sov94}, {"sov99", MetricChoice::Sov99},
+static const unordered_map<string,MetricChoice> strToMetricMap = { {"accuracy",MetricChoice::Accuracy}, {"sov94",MetricChoice::Sov94}, {"sov99", MetricChoice::Sov99},
     {"sovrefine",MetricChoice::SovRefine}, {"looseoverlap",MetricChoice::LooseOverlap}, {"strictoverlap", MetricChoice::StrictOverlap}, {"all", MetricChoice::All } };
 
 MetricChoice GetEnumFromString(const string& input) {

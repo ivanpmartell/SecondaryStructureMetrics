@@ -10,6 +10,7 @@
 #include "Utils.hpp"
 #include "Regions/SSBlock.hpp"
 #include "Regions/OverlapBlock.hpp"
+#include "Metrics/Interfaces/Metric.hpp"
 #include "Metrics/Accuracy.hpp"
 #include "Metrics/Sov94.hpp"
 #include "Metrics/LooseOverlap.hpp"
