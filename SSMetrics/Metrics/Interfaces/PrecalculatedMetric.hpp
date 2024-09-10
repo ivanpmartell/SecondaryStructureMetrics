@@ -9,4 +9,6 @@ public:
 
     virtual double CalculateAllClasses();
     virtual double CalculateOneClass(const char& secondaryStructure);
+
+    virtual ~PrecalculatedMetric() = default;
 };

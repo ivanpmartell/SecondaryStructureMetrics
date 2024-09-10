@@ -92,6 +92,6 @@ int main(int argc, char **argv) {
         delete metric;
     }
     calculatedMetrics.clear();
-
+    delete precalculation;
     return 0;
 }

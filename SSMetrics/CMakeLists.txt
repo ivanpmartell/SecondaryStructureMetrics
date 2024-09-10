@@ -9,6 +9,10 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET SSMetrics PROPERTY CXX_STANDARD 20)
 endif()
 
-# TODO: Add tests and install targets if needed.
+# Packages / Libraries to install
 find_package(CLI11 CONFIG REQUIRED)
 target_link_libraries(SSMetrics PRIVATE CLI11::CLI11)
+
+# Address Sanitizer
+#target_compile_options(SSMetrics PRIVATE -fsanitize=address)
+#target_link_options(SSMetrics PRIVATE -fsanitize=address)
