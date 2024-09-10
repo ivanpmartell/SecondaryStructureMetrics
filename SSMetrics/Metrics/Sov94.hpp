@@ -10,7 +10,7 @@ private:
     bool GetZeroDelta() const;
     int Delta(const OverlapBlock& overlapBlock);
 public:
-    Sov94(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta);
+    Sov94(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated);
 
     virtual double CalculateAllClasses();
     virtual double CalculateOneClass(const char& secondaryStructure);

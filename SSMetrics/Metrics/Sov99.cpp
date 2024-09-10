@@ -31,34 +31,34 @@ int Sov99::Delta(const OverlapBlock& overlapBlock) {
 
 int Sov99::N(const char& secondaryStructure) {
     int summation = 0;
-    for (auto blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+    for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
         summation += blockPtr->refRegion->GetLength();
     }
-    for (auto blockPtr : GetNonOverlappingBlocks(secondaryStructure)) {
+    for (auto& blockPtr : GetNonOverlappingBlocks(secondaryStructure)) {
         summation += blockPtr->GetLength();
     }
     return summation;
 }
 
-Sov99::Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta) : Metric(refSequence, predSequence) {
+Sov99::Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
     this->name = name;
     this->_zeroDelta = zeroDelta;
-    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
+    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
-        for (auto blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+        for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
         }
         this->partialComputation.try_emplace(secondaryStructure, summation);
         int normalizationValue = N(secondaryStructure);
-        _nSum += normalizationValue;
+        this->_nSum += normalizationValue;
         this->_normalization.try_emplace(secondaryStructure, normalizationValue);
     }
 }
 
 double Sov99::CalculateAllClasses() {
     double summation = 0;
-    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
+    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
         summation += GetPartialComputation(secondaryStructure);
     }
     return summation / GetNormalizationSum();

@@ -5,17 +5,17 @@
 
 using namespace std;
 
-vector<Metric*> GetMetricsToCalculate(const string& metricName, const string& refSequence, const string& predSequence, const double& lambda, const bool& zeroDelta) {
+vector<Metric*> GetMetricsToCalculate(const string& metricName, const string& refSequence, const string& predSequence, const double& lambda, const bool& zeroDelta, PrecalculatedMetric* precalculation) {
     vector<Metric*> metrics;
     MetricChoice metricEnum = GetEnumFromString(metricName);
     switch (metricEnum) {
         case MetricChoice::All: {
-            LooseOverlap* looseOverlap = new LooseOverlap("LooseOverlap", refSequence, predSequence);
-            StrictOverlap* strictOverlap = new StrictOverlap("StrictOverlap", refSequence, predSequence, zeroDelta);
-            Accuracy* accuracy = new Accuracy("Accuracy", refSequence, predSequence);
-            Sov94* sov94 = new Sov94("Sov94", refSequence, predSequence, zeroDelta);
-            Sov99* sov99 = new Sov99("Sov99", refSequence, predSequence, zeroDelta);
-            SovRefine* sovRefine = new SovRefine("SovRefine", refSequence, predSequence, zeroDelta, lambda);
+            LooseOverlap* looseOverlap = new LooseOverlap("LooseOverlap", refSequence, predSequence, precalculation);
+            StrictOverlap* strictOverlap = new StrictOverlap("StrictOverlap", refSequence, predSequence, zeroDelta, precalculation);
+            Accuracy* accuracy = new Accuracy("Accuracy", refSequence, predSequence, precalculation);
+            Sov94* sov94 = new Sov94("Sov94", refSequence, predSequence, zeroDelta, precalculation);
+            Sov99* sov99 = new Sov99("Sov99", refSequence, predSequence, zeroDelta, precalculation);
+            SovRefine* sovRefine = new SovRefine("SovRefine", refSequence, predSequence, zeroDelta, lambda, precalculation);
             metrics.push_back(looseOverlap);
             metrics.push_back(strictOverlap);
             metrics.push_back(accuracy);
@@ -25,32 +25,32 @@ vector<Metric*> GetMetricsToCalculate(const string& metricName, const string& re
             break;
         }
         case MetricChoice::Accuracy: {
-            Accuracy* accuracy = new Accuracy("Accuracy", refSequence, predSequence);
+            Accuracy* accuracy = new Accuracy("Accuracy", refSequence, predSequence, precalculation);
             metrics.push_back(accuracy);
             break;
         }
         case MetricChoice::Sov94: {
-            Sov94* sov94 = new Sov94("Sov94", refSequence, predSequence, zeroDelta);
+            Sov94* sov94 = new Sov94("Sov94", refSequence, predSequence, zeroDelta, precalculation);
             metrics.push_back(sov94);
             break;
         }
         case MetricChoice::Sov99: {
-            Sov99* sov99 = new Sov99("Sov99", refSequence, predSequence, zeroDelta);
+            Sov99* sov99 = new Sov99("Sov99", refSequence, predSequence, zeroDelta, precalculation);
             metrics.push_back(sov99);
             break;
         }
         case MetricChoice::SovRefine: {
-            SovRefine* sovRefine = new SovRefine("SovRefine", refSequence, predSequence, zeroDelta, lambda);
+            SovRefine* sovRefine = new SovRefine("SovRefine", refSequence, predSequence, zeroDelta, lambda, precalculation);
             metrics.push_back(sovRefine);
             break;
         }
         case MetricChoice::LooseOverlap: {
-            LooseOverlap* looseOverlap = new LooseOverlap("LooseOverlap", refSequence, predSequence);
+            LooseOverlap* looseOverlap = new LooseOverlap("LooseOverlap", refSequence, predSequence, precalculation);
             metrics.push_back(looseOverlap);
             break;
         }
         case MetricChoice::StrictOverlap: {
-            StrictOverlap* strictOverlap = new StrictOverlap("StrictOverlap", refSequence, predSequence, zeroDelta);
+            StrictOverlap* strictOverlap = new StrictOverlap("StrictOverlap", refSequence, predSequence, zeroDelta, precalculation);
             metrics.push_back(strictOverlap);
             break;
         }
@@ -81,13 +81,17 @@ int main(int argc, char **argv) {
     string refSequence = ReadSingleEntryFastaSequence(referencePath);
     string predSequence = ReadSingleEntryFastaSequence(predictedPath);
     
-    vector<Metric*> calculatedMetrics = GetMetricsToCalculate(metricName, refSequence, predSequence, lambda, zeroDelta);
+    PrecalculatedMetric* precalculation = new PrecalculatedMetric(refSequence, predSequence);
+
+    vector<Metric*> calculatedMetrics = GetMetricsToCalculate(metricName, refSequence, predSequence, lambda, zeroDelta, precalculation);
     for (Metric* metric : calculatedMetrics) {
         for (char const& secondaryStructure : metric->GetSecondaryStructureClasses()) {
             cout << metric->name << "_i\t" << secondaryStructure << "\t" << fixed << setprecision(3) << metric->CalculateOneClass(secondaryStructure) << endl;
         }
         cout << metric->name << "\t" << fixed << setprecision(3) << metric->CalculateAllClasses() << endl;
+        delete metric;
     }
+    calculatedMetrics.clear();
 
     return 0;
 }

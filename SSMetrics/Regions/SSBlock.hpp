@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <memory>
 #include "Region.hpp"
 #include "../Utils.hpp"
 
@@ -12,4 +13,4 @@ public:
     SSBlock() = default;
 };
 
-std::unordered_map<char, std::vector<SSBlock*>> GetBlocksForSequence(const std::string& sequence);
+std::unordered_map<char, std::vector<std::shared_ptr<SSBlock>>> GetBlocksForSequence(const std::string& sequence);

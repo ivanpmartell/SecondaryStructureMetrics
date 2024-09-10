@@ -12,7 +12,7 @@ private:
     int DeltaStrict(const OverlapBlock& overlapBlock);
     double Theta(const OverlapBlock& overlapBlock);
 public:
-    StrictOverlap(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta);
+    StrictOverlap(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated);
 
     virtual double CalculateAllClasses();
     virtual double CalculateOneClass(const char& secondaryStructure);

@@ -19,7 +19,7 @@ private:
     int Delta(const OverlapBlock& overlapBlock);
     int N(const char& secondaryStructure);
 public:
-    Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta);
+    Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated);
 
     virtual double CalculateAllClasses();
     virtual double CalculateOneClass(const char& secondaryStructure);

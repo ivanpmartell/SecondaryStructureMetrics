@@ -25,7 +25,7 @@ private:
     double Delta(const OverlapBlock& overlapBlock);
     int N(const char& secondaryStructure);
 public:
-    SovRefine(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, const double& lambda);
+    SovRefine(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, const double& lambda, PrecalculatedMetric* precalculated);
 
     virtual double CalculateAllClasses();
     virtual double CalculateOneClass(const char& secondaryStructure);

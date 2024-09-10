@@ -1,115 +1,84 @@
 #include "Metric.hpp"
 
-Metric::Metric(const string& refSequence, const string& predSequence) {
-    this->_refLength = refSequence.length();
-    this->_predLength = predSequence.length();
-    if (_refLength != _predLength) {
-        throw runtime_error("Reference and predicted sequences are not the same length");
-    }
-
-    this->_refBlocksSSMap = GetBlocksForSequence(refSequence);
-    for(auto const& kvPairs: _refBlocksSSMap) {
-        char secondaryStructure = kvPairs.first;
-        _secondaryStructuresMap.push_back(secondaryStructure);
-    }
-
-    this->_predBlocksSSMap = GetBlocksForSequence(predSequence);
-    
-    auto blockResults = CalculateOverlappingBlocks(_refBlocksSSMap, _predBlocksSSMap);
-    this->_overlappingBlocksSSMap = blockResults.first;
-    this->_nonOverlappingBlocksSSMap = blockResults.second;
+Metric::Metric(const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : IMetric(refSequence, predSequence, precalculated == nullptr) {
+    this->precalculations = precalculated;
 }
 
-int Metric::OverlapLength(const OverlapBlock& overlapBlock) {
-    return min(overlapBlock.refRegion->GetTo(), overlapBlock.predRegion->GetTo()) - max(overlapBlock.refRegion->GetFrom(), overlapBlock.predRegion->GetFrom()) + 1;
-}
-
-int Metric::GetRefLength() {
-    return _refLength;
+int Metric::GetRefLength()
+{
+    if (precalculations != nullptr) {
+        return precalculations->_GetRefLength();
+    }
+    return _GetRefLength();
 }
 
 int Metric::GetPredLength()
 {
-    return _predLength;
+    if (precalculations != nullptr) {
+        return precalculations->_GetPredLength();
+    }
+    return _GetPredLength();
 }
 
 vector<char>& Metric::GetSecondaryStructureClasses()
 {
-    return _secondaryStructuresMap;
+    if (precalculations != nullptr) {
+        return precalculations->_GetSecondaryStructureClasses();
+    }
+    return _GetSecondaryStructureClasses();
 }
 
 int Metric::GetRefLength(const char& secondaryStructure)
 {
-    if (refLengthSSMap.contains(secondaryStructure))
-    {
-        int value = refLengthSSMap[secondaryStructure];
-        if (value < 1)
-            return 1;
-        else
-            return refLengthSSMap[secondaryStructure];
-    }
-    else
-        return 1;
+    return _GetRefLength(secondaryStructure);
 }
 
 int Metric::GetPredLength(const char& secondaryStructure)
 {
-    if (predLengthSSMap.contains(secondaryStructure))
-    {
-        int value = predLengthSSMap[secondaryStructure];
-        if (value < 1)
-            return 1;
-        else
-            return predLengthSSMap[secondaryStructure];
-    }
-    else
-        return 1;
+    return _GetPredLength(secondaryStructure);
 }
 
-vector<SSBlock*>& Metric::GetRefBlocks(const char& secondaryStructure)
+vector<shared_ptr<SSBlock>>& Metric::GetRefBlocks(const char& secondaryStructure)
 {
-    if (_refBlocksSSMap.contains(secondaryStructure))
-        return _refBlocksSSMap[secondaryStructure];
-    else {
-        static vector<SSBlock*> emptyResult;
-        return emptyResult;
+    if (precalculations != nullptr) {
+        return precalculations->_GetRefBlocks(secondaryStructure);
     }
+    return _GetRefBlocks(secondaryStructure);
 }
 
-vector<SSBlock*>& Metric::GetPredBlocks(const char& secondaryStructure)
+vector<shared_ptr<SSBlock>>& Metric::GetPredBlocks(const char& secondaryStructure)
 {
-    if (_predBlocksSSMap.contains(secondaryStructure))
-        return _predBlocksSSMap[secondaryStructure];
-    else {
-        static vector<SSBlock*> emptyResult;
-        return emptyResult;
+    if (precalculations != nullptr) {
+        return precalculations->_GetPredBlocks(secondaryStructure);
     }
+    return _GetPredBlocks(secondaryStructure);
 }
 
-vector<OverlapBlock*>& Metric::GetOverlappingBlocks(const char& secondaryStructure)
+vector<shared_ptr<OverlapBlock>>& Metric::GetOverlappingBlocks(const char& secondaryStructure)
 {
-    if (_overlappingBlocksSSMap.contains(secondaryStructure))
-        return _overlappingBlocksSSMap[secondaryStructure];
-    else {
-        static vector<OverlapBlock*> emptyResult;
-        return emptyResult;
+    if (precalculations != nullptr) {
+        return precalculations->_GetOverlappingBlocks(secondaryStructure);
     }
+    return _GetOverlappingBlocks(secondaryStructure);
 }
 
-vector<SSBlock*>& Metric::GetNonOverlappingBlocks(const char& secondaryStructure)
+vector<shared_ptr<SSBlock>>& Metric::GetNonOverlappingBlocks(const char& secondaryStructure)
 {
-    if (_nonOverlappingBlocksSSMap.contains(secondaryStructure))
-        return _nonOverlappingBlocksSSMap[secondaryStructure];
-    else {
-        static vector<SSBlock*> emptyResult;
-        return emptyResult;
+    if (precalculations != nullptr) {
+        return precalculations->_GetNonOverlappingBlocks(secondaryStructure);
     }
+    return _GetNonOverlappingBlocks(secondaryStructure);
 }
 
 double Metric::GetPartialComputation(const char& secondaryStructure)
 {
-    if (partialComputation.contains(secondaryStructure))
-        return partialComputation[secondaryStructure];
-    else
-        return 0;
+    return _GetPartialComputation(secondaryStructure);
+}
+
+int Metric::OverlapLength(const OverlapBlock& overlapBlock)
+{
+    if (precalculations != nullptr) {
+        return precalculations->_OverlapLength(overlapBlock);
+    }
+    return _OverlapLength(overlapBlock);
 }
