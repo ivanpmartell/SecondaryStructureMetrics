@@ -21,6 +21,8 @@ int Sov99::GetNormalization(const char& secondaryStructure)
 }
 
 int Sov99::Delta(const OverlapBlock& overlapBlock) {
+    if (GetZeroDelta())
+        return 0;
     vector<int> choices = {
         overlapBlock.GetLength() - OverlapLength(overlapBlock),
         OverlapLength(overlapBlock),
@@ -31,19 +33,15 @@ int Sov99::Delta(const OverlapBlock& overlapBlock) {
 
 int Sov99::N(const char& secondaryStructure) {
     int summation = 0;
-    for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-        if (blockPtr == nullptr) {
-            delete &blockPtr;
-            break;
+    if (HasOverlappingBlocks(secondaryStructure)) {
+        for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+            summation += blockPtr->refRegion->GetLength();
         }
-        summation += blockPtr->refRegion->GetLength();
     }
-    for (auto& blockPtr : GetNonOverlappingBlocks(secondaryStructure)) {
-        if (blockPtr == nullptr) {
-            delete &blockPtr;
-            break;
+    if (HasNonOverlappingBlocks(secondaryStructure)) {
+        for (const auto& blockPtr : GetNonOverlappingBlocks(secondaryStructure)) {
+            summation += blockPtr->GetLength();
         }
-        summation += blockPtr->GetLength();
     }
     return summation;
 }
@@ -53,13 +51,11 @@ Sov99::Sov99(const string& name, const string& refSequence, const string& predSe
     this->_zeroDelta = zeroDelta;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
-        for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-            if (blockPtr == nullptr) {
-                delete &blockPtr;
-                break;
+        if (HasOverlappingBlocks(secondaryStructure)) {
+            for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+                OverlapBlock block = *blockPtr;
+                summation += (OverlapLength(block) + Delta(block)) / static_cast<double>(block.GetLength()) * block.refRegion->GetLength();
             }
-            OverlapBlock overlapBlockPair = *blockPtr;
-            summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
         }
         this->partialComputation.try_emplace(secondaryStructure, summation);
         int normalizationValue = N(secondaryStructure);

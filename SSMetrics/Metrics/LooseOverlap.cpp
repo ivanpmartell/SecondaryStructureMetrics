@@ -23,17 +23,15 @@ double LooseOverlap::Theta(const OverlapBlock& overlapBlock, const char& seconda
 
 LooseOverlap::LooseOverlap(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
     this->name = name;
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         int refLen = 0;
-        for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-            if (blockPtr == nullptr) {
-                delete &blockPtr;
-                break;
+        if (HasOverlappingBlocks(secondaryStructure)) {
+            for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+                OverlapBlock block = *blockPtr;
+                summation += Theta(block, secondaryStructure) * block.refRegion->GetLength();
+                refLen += block.refRegion->GetLength();
             }
-            OverlapBlock overlapBlockPair = *blockPtr;
-            summation += Theta(overlapBlockPair, secondaryStructure) * overlapBlockPair.refRegion->GetLength();
-            refLen += overlapBlockPair.refRegion->GetLength();
         }
         this->refLengthSSMap.try_emplace(secondaryStructure, refLen);
         this->partialComputation.try_emplace(secondaryStructure, summation);
@@ -42,7 +40,7 @@ LooseOverlap::LooseOverlap(const string& name, const string& refSequence, const 
 
 double LooseOverlap::CalculateAllClasses() {
     double summation = 0;
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         summation += GetPartialComputation(secondaryStructure) / GetRefLength();
     }
     return summation;

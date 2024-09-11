@@ -23,12 +23,12 @@ public:
     int& _GetRefLength();
     int& _GetPredLength();
     unordered_set<char>& _GetSecondaryStructureClasses();
-    int _GetRefLength(const char& secondaryStructure);
-    int _GetPredLength(const char& secondaryStructure);
     vector<shared_ptr<SSBlock>>& _GetRefBlocks();
     vector<shared_ptr<SSBlock>>& _GetPredBlocks();
     vector<shared_ptr<OverlapBlock>>& _GetOverlappingBlocks(const char& secondaryStructure);
     vector<shared_ptr<SSBlock>>& _GetNonOverlappingBlocks(const char& secondaryStructure);
+    int _GetOverlappingBlocksCount(const char& secondaryStructure);
+    int _GetNonOverlappingBlocksCount(const char& secondaryStructure);
 
     int _OverlapLength(const OverlapBlock& overlapBlock);
     

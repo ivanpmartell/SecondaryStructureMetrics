@@ -23,14 +23,12 @@ Sov94::Sov94(const string& name, const string& refSequence, const string& predSe
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         int refLen = 0;
-        for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-            if (blockPtr == nullptr) {
-                delete &blockPtr;
-                break;
+        if (HasOverlappingBlocks(secondaryStructure)) {
+            for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+                OverlapBlock block = *blockPtr;
+                summation += (OverlapLength(block) + Delta(block)) / static_cast<double>(block.GetLength()) * block.refRegion->GetLength();
+                refLen += block.refRegion->GetLength();
             }
-            OverlapBlock overlapBlockPair = *blockPtr;
-            summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
-            refLen += overlapBlockPair.refRegion->GetLength();
         }
         this->refLengthSSMap.try_emplace(secondaryStructure, refLen);
         this->partialComputation.try_emplace(secondaryStructure, summation);

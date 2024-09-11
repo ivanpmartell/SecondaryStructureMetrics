@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     app.add_option("-p,--predicted", predictedPath, "Path to the predicted sequence")
         -> required();
     app.add_option("-l,--lambda", lambda, "Adjustable scale parameter for SOVrefine");
-    app.add_flag("-z,--zeroDelta", zeroDelta, "Ignore the delta value (δ = 0)");
+    app.add_flag("-z,--zeroDelta", zeroDelta, "Ignore the delta value (delta = 0)");
     CLI11_PARSE(app, argc, argv);
 
     transform(metricName.begin(), metricName.end(), metricName.begin(), [](unsigned char c){ return std::tolower(c); });

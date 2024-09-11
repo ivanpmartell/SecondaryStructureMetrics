@@ -52,20 +52,28 @@ vector<shared_ptr<SSBlock>>& IMetric::_GetPredBlocks()
 
 vector<shared_ptr<OverlapBlock>>& IMetric::_GetOverlappingBlocks(const char& secondaryStructure)
 {
-    if (_overlappingBlocksSSMap.contains(secondaryStructure))
-        return _overlappingBlocksSSMap[secondaryStructure];
-    else {
-        vector<shared_ptr<OverlapBlock>>* emptyResult = new vector<shared_ptr<OverlapBlock>>(1, nullptr);
-        return *emptyResult;
-    }
+    return _overlappingBlocksSSMap[secondaryStructure];
 }
 
 vector<shared_ptr<SSBlock>>& IMetric::_GetNonOverlappingBlocks(const char& secondaryStructure)
 {
-    if (_nonOverlappingBlocksSSMap.contains(secondaryStructure))
-        return _nonOverlappingBlocksSSMap[secondaryStructure];
+    return _nonOverlappingBlocksSSMap[secondaryStructure];
+}
+
+int IMetric::_GetOverlappingBlocksCount(const char& secondaryStructure)
+{
+    if (_overlappingBlocksSSMap.contains(secondaryStructure))
+        return _overlappingBlocksSSMap[secondaryStructure].size();
     else {
-        vector<shared_ptr<SSBlock>>* emptyResult = new vector<shared_ptr<SSBlock>>(1, nullptr);
-        return *emptyResult;
+        return 0;
+    }
+}
+
+int IMetric::_GetNonOverlappingBlocksCount(const char& secondaryStructure)
+{
+    if (_nonOverlappingBlocksSSMap.contains(secondaryStructure))
+        return _nonOverlappingBlocksSSMap[secondaryStructure].size();
+    else {
+        return 0;
     }
 }

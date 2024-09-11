@@ -23,6 +23,8 @@ public:
     int GetPredLength(const char& secondaryStructure);
     vector<shared_ptr<OverlapBlock>>& GetOverlappingBlocks(const char& secondaryStructure);
     vector<shared_ptr<SSBlock>>& GetNonOverlappingBlocks(const char& secondaryStructure);
+    bool HasOverlappingBlocks(const char& secondaryStructure);
+    bool HasNonOverlappingBlocks(const char& secondaryStructure);
     double GetPartialComputation(const char& secondaryStructure);
 
     int OverlapLength(const OverlapBlock& overlapBlock);

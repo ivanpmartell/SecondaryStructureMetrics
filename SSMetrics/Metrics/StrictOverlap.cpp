@@ -8,6 +8,8 @@ bool StrictOverlap::GetZeroDelta() const
 }
 
 double StrictOverlap::DeltaSov(const OverlapBlock& overlapBlock) {
+    if (GetZeroDelta())
+        return 0;
     vector<double> choices = {
         static_cast<double>(overlapBlock.GetLength() - OverlapLength(overlapBlock)),
         static_cast<double>(OverlapLength(overlapBlock)),
@@ -42,14 +44,12 @@ StrictOverlap::StrictOverlap(const string& name, const string& refSequence, cons
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         int refLen = 0;
-        for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-            if (blockPtr == nullptr) {
-                delete &blockPtr;
-                break;
+        if (HasOverlappingBlocks(secondaryStructure)) {
+            for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+                OverlapBlock block = *blockPtr;
+                summation += Theta(block) * block.refRegion->GetLength();
+                refLen += block.refRegion->GetLength();
             }
-            OverlapBlock overlapBlockPair = *blockPtr;
-            summation += Theta(overlapBlockPair) * overlapBlockPair.refRegion->GetLength();
-            refLen += overlapBlockPair.refRegion->GetLength();
         }
         this->refLengthSSMap.try_emplace(secondaryStructure, refLen);
         this->partialComputation.try_emplace(secondaryStructure, summation);

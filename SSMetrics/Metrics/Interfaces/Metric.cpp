@@ -88,6 +88,22 @@ vector<shared_ptr<SSBlock>>& Metric::GetNonOverlappingBlocks(const char& seconda
     return _GetNonOverlappingBlocks(secondaryStructure);
 }
 
+bool Metric::HasOverlappingBlocks(const char& secondaryStructure)
+{
+    if (precalculations != nullptr) {
+        return precalculations->_GetOverlappingBlocksCount(secondaryStructure) > 0;
+    }
+    return _GetOverlappingBlocksCount(secondaryStructure) > 0;
+}
+
+bool Metric::HasNonOverlappingBlocks(const char& secondaryStructure)
+{
+    if (precalculations != nullptr) {
+        return precalculations->_GetNonOverlappingBlocksCount(secondaryStructure) > 0;
+    }
+    return _GetNonOverlappingBlocksCount(secondaryStructure) > 0;
+}
+
 double Metric::GetPartialComputation(const char& secondaryStructure)
 {
     if (partialComputation.contains(secondaryStructure))
