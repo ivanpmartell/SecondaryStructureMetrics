@@ -64,23 +64,31 @@ int main(int argc, char **argv) {
     CLI::App app{"Secondary structure metric calculator"};
 
     string metricName = "all";
-    string referencePath, predictedPath;
+    string reference, predicted;
     double lambda = 1.0;
     bool zeroDelta = false;
-    app.add_option("-m,--metric", metricName, "Name of the metric to calculate. Choices: Accuracy, SOV94, SOV99, SOVrefine, FractionalOverlap, LooseOverlap, StrictOverlap");
-    app.add_option("-r,--reference", referencePath, "Path to the reference sequence")
+    bool useFasta = false;
+    app.add_flag("-f,--fasta", useFasta, "Reference and predicted sequences are taken as fasta files");
+    app.add_option("-r,--reference", reference, "Path to the reference sequence")
         -> required();
-    app.add_option("-p,--predicted", predictedPath, "Path to the predicted sequence")
+    app.add_option("-p,--predicted", predicted, "Path to the predicted sequence")
         -> required();
+    app.add_option("-m,--metric", metricName, "Name of the metric to calculate. Ignore to calculate all metrics.\nMetric Choices: Accuracy, SOV94, SOV99, SOVrefine, LooseOverlap, StrictOverlap");
     app.add_option("-l,--lambda", lambda, "Adjustable scale parameter for SOVrefine");
-    app.add_flag("-z,--zeroDelta", zeroDelta, "Ignore the delta value (delta = 0)");
+    app.add_flag("-z,--zeroDelta", zeroDelta, "This will omit the delta value (delta = 0)");
     CLI11_PARSE(app, argc, argv);
 
     transform(metricName.begin(), metricName.end(), metricName.begin(), [](unsigned char c){ return std::tolower(c); });
-
-    string refSequence = ReadSingleEntryFastaSequence(referencePath);
-    string predSequence = ReadSingleEntryFastaSequence(predictedPath);
     
+    string refSequence, predSequence;
+    if (useFasta) {
+        refSequence = ReadSingleEntryFastaSequence(reference);
+        predSequence = ReadSingleEntryFastaSequence(predicted);
+    }
+    else {
+        refSequence = reference;
+        predSequence = predicted;
+    }
     PrecalculatedMetric* precalculation = new PrecalculatedMetric(refSequence, predSequence);
 
     vector<Metric*> calculatedMetrics = GetMetricsToCalculate(metricName, refSequence, predSequence, lambda, zeroDelta, precalculation);
