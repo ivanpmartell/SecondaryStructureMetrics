@@ -4,7 +4,7 @@ Metric::Metric(const string& refSequence, const string& predSequence, Precalcula
     this->precalculations = precalculated;
 }
 
-int Metric::GetRefLength()
+int& Metric::GetRefLength()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetRefLength();
@@ -12,7 +12,7 @@ int Metric::GetRefLength()
     return _GetRefLength();
 }
 
-int Metric::GetPredLength()
+int& Metric::GetPredLength()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetPredLength();
@@ -20,7 +20,7 @@ int Metric::GetPredLength()
     return _GetPredLength();
 }
 
-vector<char>& Metric::GetSecondaryStructureClasses()
+unordered_set<char>& Metric::GetSecondaryStructureClasses()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetSecondaryStructureClasses();
@@ -30,28 +30,46 @@ vector<char>& Metric::GetSecondaryStructureClasses()
 
 int Metric::GetRefLength(const char& secondaryStructure)
 {
-    return _GetRefLength(secondaryStructure);
+    if (refLengthSSMap.contains(secondaryStructure))
+    {
+        int value = refLengthSSMap[secondaryStructure];
+        if (value < 1)
+            return 1;
+        else
+            return refLengthSSMap[secondaryStructure];
+    }
+    else
+        return 1;
 }
 
 int Metric::GetPredLength(const char& secondaryStructure)
 {
-    return _GetPredLength(secondaryStructure);
+    if (predLengthSSMap.contains(secondaryStructure))
+    {
+        int value = predLengthSSMap[secondaryStructure];
+        if (value < 1)
+            return 1;
+        else
+            return predLengthSSMap[secondaryStructure];
+    }
+    else
+        return 1;
 }
 
-vector<shared_ptr<SSBlock>>& Metric::GetRefBlocks(const char& secondaryStructure)
+vector<shared_ptr<SSBlock>>& Metric::GetRefBlocks()
 {
     if (precalculations != nullptr) {
-        return precalculations->_GetRefBlocks(secondaryStructure);
+        return precalculations->_GetRefBlocks();
     }
-    return _GetRefBlocks(secondaryStructure);
+    return _GetRefBlocks();
 }
 
-vector<shared_ptr<SSBlock>>& Metric::GetPredBlocks(const char& secondaryStructure)
+vector<shared_ptr<SSBlock>>& Metric::GetPredBlocks()
 {
     if (precalculations != nullptr) {
-        return precalculations->_GetPredBlocks(secondaryStructure);
+        return precalculations->_GetPredBlocks();
     }
-    return _GetPredBlocks(secondaryStructure);
+    return _GetPredBlocks();
 }
 
 vector<shared_ptr<OverlapBlock>>& Metric::GetOverlappingBlocks(const char& secondaryStructure)
@@ -72,8 +90,12 @@ vector<shared_ptr<SSBlock>>& Metric::GetNonOverlappingBlocks(const char& seconda
 
 double Metric::GetPartialComputation(const char& secondaryStructure)
 {
-    return _GetPartialComputation(secondaryStructure);
+    if (partialComputation.contains(secondaryStructure))
+        return partialComputation[secondaryStructure];
+    else
+        return 0;
 }
+
 
 int Metric::OverlapLength(const OverlapBlock& overlapBlock)
 {

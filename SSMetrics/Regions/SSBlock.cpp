@@ -2,51 +2,41 @@
 
 using namespace std;
 
-SSBlock::SSBlock(const int& from, const int& to)
+SSBlock::SSBlock(const int& from, const int& to, const char& secondaryStructure)
 {
     SetFrom(from);
     SetTo(to);
+    this->_ssClass = secondaryStructure;
 }
 
-void AddBlockToVectorMap(unordered_map<char, vector<shared_ptr<SSBlock>>>& map, char key, SSBlock* blockPtr)
+char SSBlock::GetSecondaryStructure() const
 {
-    shared_ptr<SSBlock> ptr(blockPtr);
-    if (map.contains(key))
-        map[key].push_back(ptr);
-    else
-    {
-        vector<shared_ptr<SSBlock>> blocks;
-        blocks.push_back(ptr);
-        map.try_emplace(key, blocks);
-    }
+    return _ssClass;
 }
 
-unordered_map<char, vector<shared_ptr<SSBlock>>> GetBlocksForSequence(const string& sequence)
+pair<unordered_set<char>, vector<shared_ptr<SSBlock>>> GetBlocksForSequence(const string& sequence)
 {
-    unordered_map<char, vector<shared_ptr<SSBlock>>> allBlocksForSS;
-    SSBlock* prevBlock;
-    for (int i = 0; i < sequence.size(); i++)
+    unordered_set<char> ssClasses;
+    vector<shared_ptr<SSBlock>> allSequenceBlocks;
+    char secondaryStructure = sequence[0];
+    ssClasses.insert(secondaryStructure);
+    shared_ptr<SSBlock> ssBlock(new SSBlock(0, 0, secondaryStructure));
+    allSequenceBlocks.emplace_back(ssBlock);
+    shared_ptr<SSBlock> prevBlock = ssBlock;
+    for (int i = 1; i < sequence.size(); i++)
     {
         char currentChar = sequence[i];
-        if (i < 1)
+        if (sequence[i - 1] == currentChar)
         {
-            SSBlock* ssBlock = new SSBlock(i, i);
-            prevBlock = ssBlock;
-            AddBlockToVectorMap(allBlocksForSS, currentChar, ssBlock);
+            prevBlock->SetTo(i);
         }
         else
         {
-            if (sequence[i - 1] == currentChar)
-            {
-                prevBlock->SetTo(i);
-            }
-            else
-            {
-                SSBlock* ssBlock = new SSBlock(i, i);
-                prevBlock = ssBlock;
-                AddBlockToVectorMap(allBlocksForSS, currentChar, ssBlock);
-            }
+            ssClasses.insert(currentChar);
+            shared_ptr<SSBlock> ssBlock(new SSBlock(i, i, currentChar));
+            prevBlock = ssBlock;
+            allSequenceBlocks.emplace_back(ssBlock);
         }
     }
-    return allBlocksForSS;
+    return pair<unordered_set<char>, vector<shared_ptr<SSBlock>>>(ssClasses, allSequenceBlocks);
 }

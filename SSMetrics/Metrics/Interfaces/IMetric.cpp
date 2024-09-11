@@ -5,19 +5,20 @@ IMetric::IMetric(const string& refSequence, const string& predSequence, const bo
         return;
     this->_refLength = refSequence.length();
     this->_predLength = predSequence.length();
+    if (_refLength < 1) {
+        throw runtime_error("At least one of your sequences is empty");
+    }
     if (_refLength != _predLength) {
         throw runtime_error("Reference and predicted sequences are not the same length");
     }
 
-    this->_refBlocksSSMap = GetBlocksForSequence(refSequence);
-    for(auto const& kvPairs: _refBlocksSSMap) {
-        char secondaryStructure = kvPairs.first;
-        this->_secondaryStructuresMap.push_back(secondaryStructure);
-    }
+    auto refBlockResults = GetBlocksForSequence(refSequence);
+    this->_secondaryStructureClasses = refBlockResults.first;
+    this->_refBlocks = refBlockResults.second;
 
-    this->_predBlocksSSMap = GetBlocksForSequence(predSequence);
+    this->_predBlocks = GetBlocksForSequence(predSequence).second;
     
-    auto blockResults = CalculateOverlappingBlocks(_refBlocksSSMap, _predBlocksSSMap);
+    auto blockResults = CalculateOverlappingBlocks(_refBlocks, _predBlocks);
     this->_overlappingBlocksSSMap = blockResults.first;
     this->_nonOverlappingBlocksSSMap = blockResults.second;
 }
@@ -26,66 +27,27 @@ int IMetric::_OverlapLength(const OverlapBlock& overlapBlock) {
     return min(overlapBlock.refRegion->GetTo(), overlapBlock.predRegion->GetTo()) - max(overlapBlock.refRegion->GetFrom(), overlapBlock.predRegion->GetFrom()) + 1;
 }
 
-int IMetric::_GetRefLength() {
+int& IMetric::_GetRefLength() {
     return _refLength;
 }
 
-int IMetric::_GetPredLength()
-{
+int& IMetric::_GetPredLength() {
     return _predLength;
 }
 
-vector<char>& IMetric::_GetSecondaryStructureClasses()
+unordered_set<char>& IMetric::_GetSecondaryStructureClasses()
 {
-    return _secondaryStructuresMap;
+    return _secondaryStructureClasses;
 }
 
-int IMetric::_GetRefLength(const char& secondaryStructure)
+vector<shared_ptr<SSBlock>>& IMetric::_GetRefBlocks()
 {
-    if (refLengthSSMap.contains(secondaryStructure))
-    {
-        int value = refLengthSSMap[secondaryStructure];
-        if (value < 1)
-            return 1;
-        else
-            return refLengthSSMap[secondaryStructure];
-    }
-    else
-        return 1;
+    return _refBlocks;
 }
 
-int IMetric::_GetPredLength(const char& secondaryStructure)
+vector<shared_ptr<SSBlock>>& IMetric::_GetPredBlocks()
 {
-    if (predLengthSSMap.contains(secondaryStructure))
-    {
-        int value = predLengthSSMap[secondaryStructure];
-        if (value < 1)
-            return 1;
-        else
-            return predLengthSSMap[secondaryStructure];
-    }
-    else
-        return 1;
-}
-
-vector<shared_ptr<SSBlock>>& IMetric::_GetRefBlocks(const char& secondaryStructure)
-{
-    if (_refBlocksSSMap.contains(secondaryStructure))
-        return _refBlocksSSMap[secondaryStructure];
-    else {
-        vector<shared_ptr<SSBlock>> emptyResult;
-        return emptyResult;
-    }
-}
-
-vector<shared_ptr<SSBlock>>& IMetric::_GetPredBlocks(const char& secondaryStructure)
-{
-    if (_predBlocksSSMap.contains(secondaryStructure))
-        return _predBlocksSSMap[secondaryStructure];
-    else {
-        vector<shared_ptr<SSBlock>> emptyResult;
-        return emptyResult;
-    }
+    return _predBlocks;
 }
 
 vector<shared_ptr<OverlapBlock>>& IMetric::_GetOverlappingBlocks(const char& secondaryStructure)
@@ -93,8 +55,8 @@ vector<shared_ptr<OverlapBlock>>& IMetric::_GetOverlappingBlocks(const char& sec
     if (_overlappingBlocksSSMap.contains(secondaryStructure))
         return _overlappingBlocksSSMap[secondaryStructure];
     else {
-        vector<shared_ptr<OverlapBlock>> emptyResult;
-        return emptyResult;
+        vector<shared_ptr<OverlapBlock>>* emptyResult = new vector<shared_ptr<OverlapBlock>>(1, nullptr);
+        return *emptyResult;
     }
 }
 
@@ -103,15 +65,7 @@ vector<shared_ptr<SSBlock>>& IMetric::_GetNonOverlappingBlocks(const char& secon
     if (_nonOverlappingBlocksSSMap.contains(secondaryStructure))
         return _nonOverlappingBlocksSSMap[secondaryStructure];
     else {
-        vector<shared_ptr<SSBlock>> emptyResult;
-        return emptyResult;
+        vector<shared_ptr<SSBlock>>* emptyResult = new vector<shared_ptr<SSBlock>>(1, nullptr);
+        return *emptyResult;
     }
-}
-
-double IMetric::_GetPartialComputation(const char& secondaryStructure)
-{
-    if (partialComputation.contains(secondaryStructure))
-        return partialComputation[secondaryStructure];
-    else
-        return 0;
 }

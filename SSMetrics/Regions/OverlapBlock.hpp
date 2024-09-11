@@ -23,5 +23,5 @@ public:
 };
 
 std::pair<std::unordered_map<char, std::vector<std::shared_ptr<OverlapBlock>>>, std::unordered_map<char, std::vector<std::shared_ptr<SSBlock>>>> CalculateOverlappingBlocks
-    ( const std::unordered_map<char, std::vector<std::shared_ptr<SSBlock>>>& refBlocks,
-    const std::unordered_map<char, std::vector<std::shared_ptr<SSBlock>>>& predBlocks );
+    ( const std::vector<std::shared_ptr<SSBlock>>& refBlocks,
+    const std::vector<std::shared_ptr<SSBlock>>& predBlocks );

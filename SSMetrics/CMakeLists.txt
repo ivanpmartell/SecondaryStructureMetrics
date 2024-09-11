@@ -16,3 +16,13 @@ target_link_libraries(SSMetrics PRIVATE CLI11::CLI11)
 # Address Sanitizer
 #target_compile_options(SSMetrics PRIVATE -fsanitize=address)
 #target_link_options(SSMetrics PRIVATE -fsanitize=address)
+
+# Enable debug symbols for release version
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC" AND CMAKE_BUILD_TYPE MATCHES "Release")
+   target_compile_options(SSMetrics PRIVATE /Zi)
+
+   # Tell linker to include symbol data
+    set_target_properties(SSMetrics PROPERTIES 
+        LINK_FLAGS "/INCREMENTAL:NO /DEBUG /OPT:REF /OPT:ICF"
+    )
+endif()

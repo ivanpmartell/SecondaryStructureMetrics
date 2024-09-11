@@ -27,6 +27,10 @@ LooseOverlap::LooseOverlap(const string& name, const string& refSequence, const 
         double summation = 0;
         int refLen = 0;
         for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+            if (blockPtr == nullptr) {
+                delete &blockPtr;
+                break;
+            }
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += Theta(overlapBlockPair, secondaryStructure) * overlapBlockPair.refRegion->GetLength();
             refLen += overlapBlockPair.refRegion->GetLength();

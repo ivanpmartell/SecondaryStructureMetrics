@@ -42,10 +42,12 @@ double SovRefine::Delta(const OverlapBlock& overlapBlock) {
 double SovRefine::DeltaAll()
 {
     double summation = 0;
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
-        for (auto& blockPtr : GetRefBlocks(secondaryStructure)) {
-            summation += pow(blockPtr->GetLength() / (double)GetRefLength(), 2);
+    for (auto& blockPtr : GetRefBlocks()) {
+        if (blockPtr == nullptr) {
+            delete &blockPtr;
+            break;
         }
+        summation += pow(blockPtr->GetLength() / (double)GetRefLength(), 2);
     }
     return GetLambda() * (GetSecondaryStructureClasses().size() / summation);
 }
@@ -53,9 +55,17 @@ double SovRefine::DeltaAll()
 int SovRefine::N(const char& secondaryStructure) {
     int summation = 0;
     for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+        if (blockPtr == nullptr) {
+            delete &blockPtr;
+            break;
+        }
         summation += blockPtr->refRegion->GetLength();
     }
     for (auto& blockPtr : GetNonOverlappingBlocks(secondaryStructure)) {
+        if (blockPtr == nullptr || !blockPtr) {
+            delete &blockPtr;
+            break;
+        }
         summation += blockPtr->GetLength();
     }
     return summation;
@@ -66,9 +76,13 @@ SovRefine::SovRefine(const string& name, const string& refSequence, const string
     this->_zeroDelta = zeroDelta;
     this->_lambda = lambda;
     _deltaAll = DeltaAll();
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+            if (blockPtr == nullptr) {
+                delete &blockPtr;
+                break;
+            }
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
         }
@@ -81,7 +95,7 @@ SovRefine::SovRefine(const string& name, const string& refSequence, const string
 
 double SovRefine::CalculateAllClasses() {
     double summation = 0;
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         summation += GetPartialComputation(secondaryStructure);
     }
     return summation / GetNormalizationSum();

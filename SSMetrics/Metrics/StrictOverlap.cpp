@@ -39,10 +39,14 @@ double StrictOverlap::Theta(const OverlapBlock& overlapBlock)
 StrictOverlap::StrictOverlap(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
     this->name = name;
     this->_zeroDelta = zeroDelta;
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         int refLen = 0;
         for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+            if (blockPtr == nullptr) {
+                delete &blockPtr;
+                break;
+            }
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += Theta(overlapBlockPair) * overlapBlockPair.refRegion->GetLength();
             refLen += overlapBlockPair.refRegion->GetLength();
@@ -54,7 +58,7 @@ StrictOverlap::StrictOverlap(const string& name, const string& refSequence, cons
 
 double StrictOverlap::CalculateAllClasses() {
     double summation = 0;
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         summation += GetPartialComputation(secondaryStructure) / GetRefLength();
     }
     return summation;

@@ -32,9 +32,17 @@ int Sov99::Delta(const OverlapBlock& overlapBlock) {
 int Sov99::N(const char& secondaryStructure) {
     int summation = 0;
     for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+        if (blockPtr == nullptr) {
+            delete &blockPtr;
+            break;
+        }
         summation += blockPtr->refRegion->GetLength();
     }
     for (auto& blockPtr : GetNonOverlappingBlocks(secondaryStructure)) {
+        if (blockPtr == nullptr) {
+            delete &blockPtr;
+            break;
+        }
         summation += blockPtr->GetLength();
     }
     return summation;
@@ -43,9 +51,13 @@ int Sov99::N(const char& secondaryStructure) {
 Sov99::Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
     this->name = name;
     this->_zeroDelta = zeroDelta;
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+            if (blockPtr == nullptr) {
+                delete &blockPtr;
+                break;
+            }
             OverlapBlock overlapBlockPair = *blockPtr;
             summation += (OverlapLength(overlapBlockPair) + Delta(overlapBlockPair)) / static_cast<double>(overlapBlockPair.GetLength()) * overlapBlockPair.refRegion->GetLength();
         }
@@ -58,7 +70,7 @@ Sov99::Sov99(const string& name, const string& refSequence, const string& predSe
 
 double Sov99::CalculateAllClasses() {
     double summation = 0;
-    for (auto& secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         summation += GetPartialComputation(secondaryStructure);
     }
     return summation / GetNormalizationSum();

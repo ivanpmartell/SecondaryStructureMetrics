@@ -4,10 +4,14 @@ using namespace std;
 
 Accuracy::Accuracy(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
     this->name = name;
-    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         int summation = 0;
         int refLen = 0;
         for (auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
+            if (blockPtr == nullptr) {
+                delete &blockPtr;
+                break;
+            }
             OverlapBlock block = *blockPtr;
             summation += OverlapLength(block);
             refLen += block.refRegion->GetLength();
@@ -19,7 +23,7 @@ Accuracy::Accuracy(const string& name, const string& refSequence, const string& 
 
 double Accuracy::CalculateAllClasses() {
     double summation = 0;
-    for (auto secondaryStructure : GetSecondaryStructureClasses()) {
+    for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         summation += GetPartialComputation(secondaryStructure) / GetRefLength();
     }
     return summation;
