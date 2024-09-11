@@ -33,8 +33,8 @@ jobs:
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
-          configurePreset: 'linux-release'
-          buildPreset: 'linux-release'
+          configurePreset: 'actions-release'
+          buildPreset: 'actions-release'
       - name: List $RUNNER_WORKSPACE after build
         run: find $RUNNER_WORKSPACE
         shell: bash
@@ -42,5 +42,5 @@ jobs:
       - name: Zip build artifacts
         uses: vimtor/action-zip@v1.2
         with:
-          files: out/build/linux-release/SSMetrics
+          files: out/build/actions-release/SSMetrics
           dest: linux_x64.zip
