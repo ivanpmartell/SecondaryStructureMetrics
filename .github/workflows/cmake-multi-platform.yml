@@ -15,7 +15,7 @@ jobs:
 
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
-      TOOLCHAIN_PATH: ${{ github.workspace }}/scripts/buildsystems/vcpkg.cmake
+      TOOLCHAIN_PATH: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +27,8 @@ jobs:
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         id: runvcpkg
+        with:
+          vcpkgDirectory: ${{ github.workspace }}/vcpkg
 
       - name: Run CMake+vcpkg+NinjaMulti-Config (Release configuration)
         uses: lukka/run-cmake@v10
