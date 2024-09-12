@@ -10,8 +10,10 @@ if (POLICY CMP0141)
 endif()
 
 # Statically link libraries
-set(BUILD_SHARED_LIBS OFF)
-set(CMAKE_EXE_LINKER_FLAGS "-static")
+if (NOT APPLE)
+  set(BUILD_SHARED_LIBS OFF)
+  set(CMAKE_EXE_LINKER_FLAGS "-static")
+endif()
 
 project ("SSMetrics")
 
