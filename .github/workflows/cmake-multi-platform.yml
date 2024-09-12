@@ -40,7 +40,7 @@ jobs:
         os: [ubuntu-latest]
         include:
           - os: ubuntu-latest
-            triplet: x64-linux
+            triplet: [x64-linux, x86-linux]
 
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
@@ -78,6 +78,6 @@ jobs:
           Platform: ${{ matrix.triplet }}
         with:
           upload_url: ${{ needs.prepare.outputs.outputUrl }}
-          asset_path: ssmetrics_${{ env.Platform }}.zip
+          asset_path: ${{ env.Platform }}.zip
           asset_name: ssmetrics_${{ env.Platform }}.zip
           asset_content_type: application/zip
