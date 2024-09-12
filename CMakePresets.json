@@ -115,5 +115,14 @@
         "CMAKE_TOOLCHAIN_FILE": "$env{TOOLCHAIN_PATH}"
       }
     }
+  ],
+  "buildPresets": [
+    {
+      "name": "ninja-vcpkg-release",
+      "configurePreset": "actions-release",
+      "displayName": "Build (Release)",
+      "description": "Build with Ninja/vcpkg (Release)",
+      "configuration": "Release"
+    }
   ]
 }

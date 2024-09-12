@@ -36,7 +36,6 @@ jobs:
     name: ${{ matrix.os }}-${{ github.workflow }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         platform: [linux64, linux32, macos64, macos32, windows64, windows32]
         include:
@@ -82,10 +81,7 @@ jobs:
         id: runcmake
         with:
           configurePreset: 'actions-release'
-
-      - name: Build project
-        run: |
-            cmake --build 
+          buildPreset: 'ninja-vcpkg-release'
 
       - name: List $RUNNER_WORKSPACE after build
         run: find $RUNNER_WORKSPACE
