@@ -1,8 +1,37 @@
-name: hosted-ninja_multi-vcpkg_submod-triplet-cacheoff
-on: [push, workflow_dispatch]
+name: build-cmake-multiplatform-releases
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
-  job:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      outputVersion: ${{ steps.tag_version.outputs.new_version }}
+      outputUrl: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Bump version and push tag
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v6.0
+      with:
+        github_token: ${{ secrets.TOKEN }}
+        default_bump: patch
+
+    - name: Create a GitHub release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+        tag_name: ${{ steps.tag_version.outputs.new_tag }}
+        body: ${{ steps.tag_version.outputs.changelog }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+  build:
     name: ${{ matrix.os }}-${{ github.workflow }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -35,10 +64,20 @@ jobs:
         id: runcmake
         with:
           configurePreset: 'actions-release'
-          buildPreset: 'actions-release'
 
       - name: Zip build artifacts
         uses: vimtor/action-zip@v1.2
         with:
           files: out/build/actions-release/SSMetrics
           dest: ${{ matrix.triplet }}.zip
+
+      - name: Upload zipped artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          Platform: ${{ matrix.triplet }}
+        with:
+          upload_url: ${{ needs.prepare.outputs.outputUrl }}
+          asset_path: ssmetrics_${{ env.Platform }}.zip
+          asset_name: ssmetrics_${{ env.Platform }}.zip
+          asset_content_type: application/zip
