@@ -38,11 +38,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [linux64]
+        platform: [linux64, linux32, macos64, macos32, windows64, windows32]
         include:
           - platform: linux64
             os: ubuntu-latest
             triplet: x64-linux
+          - platform: linux32
+            os: ubuntu-latest
+            triplet: x86-linux
+          - platform: macos64
+            os: macos-latest
+            triplet: x64-osx
+          - platform: macos32
+            os: macos-latest
+            triplet: x86-osx
+          - platform: windows64
+            os: windows-latest
+            triplet: x64-windows
+          - platform: windows32
+            os: windows-latest
+            triplet: x86-windows
 
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
@@ -62,16 +77,24 @@ jobs:
         with:
           vcpkgDirectory: ${{ github.workspace }}/vcpkg
 
-      - name: Run CMake+vcpkg+NinjaMulti-Config (Release configuration)
+      - name: Restore project files
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
           configurePreset: 'actions-release'
 
+      - name: Build project
+        run: |
+            cmake --build 
+
+      - name: List $RUNNER_WORKSPACE after build
+        run: find $RUNNER_WORKSPACE
+        shell: bash
+
       - name: Zip build artifacts
         uses: vimtor/action-zip@v1.2
         with:
-          files: out
+          files: out/build/actions-release/SSMetrics
           dest: ${{ matrix.triplet }}.zip
 
       - name: Upload zipped artifact
