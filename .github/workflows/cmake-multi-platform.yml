@@ -37,10 +37,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        platform: [linux64, linux32]
         include:
-          - os: ubuntu-latest
-            triplet: [x64-linux, x86-linux]
+          - platform: linux64
+            os: ubuntu-latest
+            triplet: x64-linux
+          - platform: linux32
+            os: ubuntu-latest
+            triplet: x86-linux
 
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
@@ -75,9 +79,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          Platform: ${{ matrix.triplet }}
         with:
           upload_url: ${{ needs.prepare.outputs.outputUrl }}
-          asset_path: ${{ env.Platform }}.zip
-          asset_name: ssmetrics_${{ env.Platform }}.zip
+          asset_path: ${{ matrix.triplet }}.zip
+          asset_name: ssmetrics_${{ matrix.triplet }}.zip
           asset_content_type: application/zip
