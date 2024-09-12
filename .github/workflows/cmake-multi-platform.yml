@@ -68,6 +68,12 @@ jobs:
         with:
           submodules: true
 
+      - name: Install compiler
+        id: install_cc
+        uses: rlalik/setup-cpp-compiler@master
+        with:
+          compiler: latest
+
       - uses: lukka/get-cmake@latest
 
       - name: Setup vcpkg
@@ -81,6 +87,10 @@ jobs:
         id: runcmake
         with:
           configurePreset: 'actions-release'
+      
+      - name: Build (Release configuration)
+        run: |
+          cmake --build --preset actions-release
 
       - name: List $RUNNER_WORKSPACE after build
         run: find $RUNNER_WORKSPACE
