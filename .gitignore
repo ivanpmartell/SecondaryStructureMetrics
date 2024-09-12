@@ -450,3 +450,4 @@ out/
 
 # vcPkg
 vcpkg_installed/
+vcpkg-configuration.json
