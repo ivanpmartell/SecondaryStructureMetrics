@@ -27,20 +27,18 @@ jobs:
         uses: lukka/run-vcpkg@v11
         id: runvcpkg
 
-      - name: Prints output of run-vcpkg's action.
-        run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}' "
       - name: Run CMake+vcpkg+NinjaMulti-Config (Release configuration)
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
           configurePreset: 'actions-release'
           buildPreset: 'actions-release'
-      - name: List $RUNNER_WORKSPACE after build
-        run: find $RUNNER_WORKSPACE
-        shell: bash
+          buildPresetAdditionalArgs: '[`-DCMAKE_TOOLCHAIN_FILE=${{ env.Toolchain_path }}`]'
+        env:
+          Toolchain_path: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}/scripts/buildsystems/vcpkg.cmake
 
       - name: Zip build artifacts
         uses: vimtor/action-zip@v1.2
         with:
           files: out/build/actions-release/SSMetrics
-          dest: linux_x64.zip
+          dest: ${{ matrix.triplet }}.zip
