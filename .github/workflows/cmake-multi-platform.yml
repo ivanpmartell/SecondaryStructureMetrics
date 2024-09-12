@@ -61,6 +61,7 @@ jobs:
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
       TOOLCHAIN_PATH: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+      ARTIFACTS_PATH: ${{ github.workspace }}/out/build/actions-release/SSMetrics
 
     steps:
       - uses: actions/checkout@v4
@@ -88,10 +89,8 @@ jobs:
         with:
           type: 'zip'
           filename: ${{ matrix.triplet }}.zip
-          directory: ${{ env.BuildPath }}
+          directory: ${{ env.ARTIFACTS_PATH }}
           path: SSMetrics*
-        env:
-          BuildPath: ${{ github.workspace }}/out/build/actions-release/SSMetrics
 
       - name: Upload zipped artifact
         uses: actions/upload-release-asset@v1
@@ -99,6 +98,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ needs.prepare.outputs.outputUrl }}
-          asset_path: ${{ matrix.triplet }}.zip
+          asset_path: ${{ env.ARTIFACTS_PATH }}/${{ matrix.triplet }}.zip
           asset_name: ssmetrics_${{ matrix.triplet }}.zip
           asset_content_type: application/zip
