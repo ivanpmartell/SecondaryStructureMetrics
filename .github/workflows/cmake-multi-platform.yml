@@ -15,7 +15,7 @@ jobs:
 
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
-      TOOLCHAIN_PATH: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}/scripts/buildsystems/vcpkg.cmake
+      TOOLCHAIN_PATH: ${{ github.workspace }}/scripts/buildsystems/vcpkg.cmake
 
     steps:
       - uses: actions/checkout@v4
