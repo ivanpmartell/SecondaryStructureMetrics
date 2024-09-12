@@ -17,7 +17,7 @@ jobs:
       uses: mathieudutour/github-tag-action@v6.0
       with:
         github_token: ${{ secrets.TOKEN }}
-        default_bump: patch
+        default_bump: minor
 
     - name: Create a GitHub release
       uses: actions/create-release@v1
@@ -76,16 +76,12 @@ jobs:
         with:
           vcpkgDirectory: ${{ github.workspace }}/vcpkg
 
-      - name: Restore project files
+      - name: Build project
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
           configurePreset: 'actions-release'
           buildPreset: 'ninja-vcpkg-release'
-
-      - name: List $RUNNER_WORKSPACE after build
-        run: find $RUNNER_WORKSPACE
-        shell: bash
 
       - name: Zip build artifacts
         uses: vimtor/action-zip@v1.2
