@@ -15,6 +15,7 @@ jobs:
 
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+      TOOLCHAIN_PATH: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}/scripts/buildsystems/vcpkg.cmake
 
     steps:
       - uses: actions/checkout@v4
@@ -33,9 +34,6 @@ jobs:
         with:
           configurePreset: 'actions-release'
           buildPreset: 'actions-release'
-          buildPresetAdditionalArgs: '[`-DCMAKE_TOOLCHAIN_FILE=${{ env.Toolchain_path }}`]'
-        env:
-          Toolchain_path: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}/scripts/buildsystems/vcpkg.cmake
 
       - name: Zip build artifacts
         uses: vimtor/action-zip@v1.2
