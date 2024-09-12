@@ -53,13 +53,8 @@ jobs:
         with:
           submodules: true
 
-      - name: Install compiler
-        id: install_cc
-        uses: rlalik/setup-cpp-compiler@master
-        with:
-          compiler: latest
-
-      - uses: lukka/get-cmake@latest
+      - name: Install cmake
+        uses: lukka/get-cmake@latest
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -85,6 +80,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ needs.prepare.outputs.outputUrl }}
-          asset_path: out
+          asset_path: ${{ matrix.triplet }}.zip
           asset_name: ssmetrics_${{ matrix.triplet }}.zip
           asset_content_type: application/zip
