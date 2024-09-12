@@ -84,10 +84,14 @@ jobs:
           buildPreset: 'ninja-vcpkg-release'
 
       - name: Zip build artifacts
-        uses: vimtor/action-zip@v1.2
+        uses: thedoctor0/zip-release@0.7.6
         with:
-          files: out/build/actions-release/SSMetrics
-          dest: ${{ matrix.triplet }}.zip
+          type: 'zip'
+          filename: ${{ matrix.triplet }}.zip
+          directory: ${{ env.BuildPath }}
+          path: SSMetrics*
+        env:
+          BuildPath: ${{ github.workspace }}/out/build/actions-release/SSMetrics
 
       - name: Upload zipped artifact
         uses: actions/upload-release-asset@v1
