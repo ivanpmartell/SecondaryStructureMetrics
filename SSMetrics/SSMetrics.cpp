@@ -60,24 +60,7 @@ vector<Metric*> GetMetricsToCalculate(const string& metricName, const string& re
     return metrics;
 }
 
-int main(int argc, char **argv) {
-    CLI::App app{"Secondary structure metric calculator"};
-
-    string metricName = "all";
-    string reference, predicted;
-    double lambda = 1.0;
-    bool zeroDelta = false;
-    bool useFasta = false;
-    app.add_flag("-f,--fasta", useFasta, "Reference and predicted sequences are taken as fasta files");
-    app.add_option("-r,--reference", reference, "Path to the reference sequence")
-        -> required();
-    app.add_option("-p,--predicted", predicted, "Path to the predicted sequence")
-        -> required();
-    app.add_option("-m,--metric", metricName, "Name of the metric to calculate. Ignore to calculate all metrics.\nMetric Choices: Accuracy, SOV94, SOV99, SOVrefine, LooseOverlap, StrictOverlap");
-    app.add_option("-l,--lambda", lambda, "Adjustable scale parameter for SOVrefine");
-    app.add_flag("-z,--zeroDelta", zeroDelta, "This will omit the delta value (delta = 0)");
-    CLI11_PARSE(app, argc, argv);
-
+void run(string& metricName, const string& reference, const string& predicted, const double& lambda, const bool& zeroDelta, const bool& useFasta) {
     transform(metricName.begin(), metricName.end(), metricName.begin(), [](unsigned char c){ return std::tolower(c); });
     
     string refSequence, predSequence;
@@ -101,5 +84,32 @@ int main(int argc, char **argv) {
     }
     calculatedMetrics.clear();
     delete precalculation;
-    return 0;
+}
+
+int main(int argc, char **argv) {
+    CLI::App app{"Secondary structure metric calculator"};
+
+    string metricName = "all";
+    string reference, predicted;
+    double lambda = 1.0;
+    bool zeroDelta = false;
+    bool useFasta = false;
+    app.add_flag("-f,--fasta", useFasta, "Reference and predicted sequences are taken as fasta files");
+    app.add_option("-r,--reference", reference, "Path to the reference sequence")
+        -> required();
+    app.add_option("-p,--predicted", predicted, "Path to the predicted sequence")
+        -> required();
+    app.add_option("-m,--metric", metricName, "Name of the metric to calculate. Ignore to calculate all metrics.\nMetric Choices: Accuracy, SOV94, SOV99, SOVrefine, LooseOverlap, StrictOverlap");
+    app.add_option("-l,--lambda", lambda, "Adjustable scale parameter for SOVrefine");
+    app.add_flag("-z,--zeroDelta", zeroDelta, "This will omit the delta value (delta = 0)");
+    CLI11_PARSE(app, argc, argv);
+
+    try {
+        run(metricName, reference, predicted, lambda, zeroDelta, useFasta);
+        return 0;
+    }
+    catch (const exception& e) {
+        cerr << e.what();
+        return 1;
+    }
 }

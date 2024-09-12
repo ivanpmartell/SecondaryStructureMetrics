@@ -18,7 +18,7 @@ MetricChoice GetEnumFromString(const string& input) {
 string ReadSingleEntryFastaSequence(const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
-        return "";
+        throw runtime_error("Input is not a file: " + filename);
     }
     string line;
     getline(file, line);
