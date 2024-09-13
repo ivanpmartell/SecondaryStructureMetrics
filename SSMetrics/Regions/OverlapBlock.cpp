@@ -25,22 +25,22 @@ int OverlapBlock::GetLength() const {
 void AddBlockToVectorMap(unordered_map<char, vector<shared_ptr<OverlapBlock>>>& map, const char& key, const shared_ptr<OverlapBlock>& blockPtr) {
     shared_ptr<OverlapBlock> ptr(blockPtr);
     if (map.contains(key))
-        map[key].push_back(ptr);
+        map[key].emplace_back(ptr);
     else
     {
         vector<shared_ptr<OverlapBlock>> blocks;
-        blocks.push_back(ptr);
+        blocks.emplace_back(ptr);
         map.try_emplace(key, blocks);
     }
 }
 
 void AddBlockToVectorMap(unordered_map<char, vector<shared_ptr<SSBlock>>>& map, const char& key, const shared_ptr<SSBlock>& blockPtr) {
     if (map.contains(key))
-        map[key].push_back(blockPtr);
+        map[key].emplace_back(blockPtr);
     else
     {
         vector<shared_ptr<SSBlock>> blocks;
-        blocks.push_back(blockPtr);
+        blocks.emplace_back(blockPtr);
         map.try_emplace(key, blocks);
     }
 }
