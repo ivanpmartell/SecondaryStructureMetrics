@@ -71,7 +71,7 @@ pair<unordered_map<char, vector<shared_ptr<OverlapBlock>>>, unordered_map<char, 
 
         if (refSS == predSS) {
             hadOverlap = true;
-            shared_ptr<OverlapBlock> overlapBlock(new OverlapBlock(currentRefBlockPtr, currentPredBlockPtr));
+            shared_ptr<OverlapBlock> overlapBlock = make_shared<OverlapBlock>(OverlapBlock(currentRefBlockPtr, currentPredBlockPtr));
             AddBlockToVectorMap(allOverlappingBlocksForSS, refSS, overlapBlock);
         }
 

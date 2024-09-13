@@ -75,12 +75,13 @@ void run(string& metricName, const string& reference, const string& predicted, c
     PrecalculatedMetric* precalculation = new PrecalculatedMetric(refSequence, predSequence);
 
     vector<Metric*> calculatedMetrics = GetMetricsToCalculate(metricName, refSequence, predSequence, lambda, zeroDelta, precalculation);
-    for (Metric* metric : calculatedMetrics) {
-        for (const auto& secondaryStructure : metric->GetSecondaryStructureClasses()) {
-            cout << metric->name << "_i\t" << secondaryStructure << "\t" << fixed << setprecision(3) << metric->CalculateOneClass(secondaryStructure) << endl;
+    for (Metric* metricPtr : calculatedMetrics) {
+        Metric& metric = *metricPtr;
+        for (const auto& secondaryStructure : metric.GetSecondaryStructureClasses()) {
+            cout << format("{0}_i\t{1}\t{2:.3f}", metric.name, secondaryStructure, metric.CalculateOneClass(secondaryStructure)) << endl;
         }
-        cout << metric->name << "\t" << fixed << setprecision(3) << metric->CalculateAllClasses() << endl;
-        delete metric;
+        cout << format("{0}\t{1:.3f}", metric.name, metric.CalculateAllClasses()) << endl;
+        delete metricPtr;
     }
     calculatedMetrics.clear();
     delete precalculation;

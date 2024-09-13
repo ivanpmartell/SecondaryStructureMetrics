@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <format>
 #include <CLI/CLI.hpp>
 #include <stdexcept>
 #include "Utils.hpp"

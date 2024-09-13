@@ -20,7 +20,7 @@ pair<unordered_set<char>, vector<shared_ptr<SSBlock>>> GetBlocksForSequence(cons
     vector<shared_ptr<SSBlock>> allSequenceBlocks;
     char secondaryStructure = sequence[0];
     ssClasses.insert(secondaryStructure);
-    shared_ptr<SSBlock> ssBlock(new SSBlock(0, 0, secondaryStructure));
+    shared_ptr<SSBlock> ssBlock = make_shared<SSBlock>(SSBlock(0, 0, secondaryStructure));
     allSequenceBlocks.emplace_back(ssBlock);
     shared_ptr<SSBlock> prevBlock = ssBlock;
     for (int i = 1; i < sequence.size(); i++)
@@ -33,7 +33,7 @@ pair<unordered_set<char>, vector<shared_ptr<SSBlock>>> GetBlocksForSequence(cons
         else
         {
             ssClasses.insert(currentChar);
-            shared_ptr<SSBlock> ssBlock(new SSBlock(i, i, currentChar));
+            shared_ptr<SSBlock> ssBlock = make_shared<SSBlock>(SSBlock(i, i, currentChar));
             prevBlock = ssBlock;
             allSequenceBlocks.emplace_back(ssBlock);
         }
