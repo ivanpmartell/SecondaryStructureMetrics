@@ -12,3 +12,6 @@ endif()
 # Packages / Libraries to install
 find_package(CLI11 CONFIG REQUIRED)
 target_link_libraries(SSMetrics PRIVATE CLI11::CLI11)
+
+find_package(fmt CONFIG REQUIRED)
+target_link_libraries(SSMetrics PRIVATE fmt::fmt)

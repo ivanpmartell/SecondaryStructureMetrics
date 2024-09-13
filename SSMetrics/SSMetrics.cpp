@@ -78,9 +78,9 @@ void run(string& metricName, const string& reference, const string& predicted, c
     for (Metric* metricPtr : calculatedMetrics) {
         Metric& metric = *metricPtr;
         for (const auto& secondaryStructure : metric.GetSecondaryStructureClasses()) {
-            cout << format("{0}_i\t{1}\t{2:.3f}", metric.name, secondaryStructure, metric.CalculateOneClass(secondaryStructure)) << endl;
+            fmt::print("{0}_i\t{1}\t{2:.3f}\n", metric.name, secondaryStructure, metric.CalculateOneClass(secondaryStructure));
         }
-        cout << format("{0}\t{1:.3f}", metric.name, metric.CalculateAllClasses()) << endl;
+        fmt::print("{0}\t{1:.3f}\n", metric.name, metric.CalculateAllClasses());
         delete metricPtr;
     }
     calculatedMetrics.clear();
