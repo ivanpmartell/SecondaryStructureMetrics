@@ -1,10 +1,16 @@
 #include "Metric.hpp"
 
-Metric::Metric(const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : IMetric(refSequence, predSequence, precalculated == nullptr) {
+Metric::Metric(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : IMetric(refSequence, predSequence, precalculated == nullptr) {
     this->precalculations = precalculated;
+    this->_name = name;
 }
 
-int& Metric::GetRefLength()
+string& Metric::GetName()
+{
+    return _name;
+}
+
+int Metric::GetRefLength()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetRefLength();
@@ -12,7 +18,7 @@ int& Metric::GetRefLength()
     return _GetRefLength();
 }
 
-int& Metric::GetPredLength()
+int Metric::GetPredLength()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetPredLength();
@@ -56,7 +62,7 @@ int Metric::GetPredLength(const char& secondaryStructure)
         return 1;
 }
 
-vector<shared_ptr<SSBlock>>& Metric::GetRefBlocks()
+vector<SSBlock>& Metric::GetRefBlocks()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetRefBlocks();
@@ -64,7 +70,7 @@ vector<shared_ptr<SSBlock>>& Metric::GetRefBlocks()
     return _GetRefBlocks();
 }
 
-vector<shared_ptr<SSBlock>>& Metric::GetPredBlocks()
+vector<SSBlock>& Metric::GetPredBlocks()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetPredBlocks();
@@ -72,7 +78,7 @@ vector<shared_ptr<SSBlock>>& Metric::GetPredBlocks()
     return _GetPredBlocks();
 }
 
-vector<shared_ptr<OverlapBlock>>& Metric::GetOverlappingBlocks(const char& secondaryStructure)
+vector<OverlapBlock>& Metric::GetOverlappingBlocks(const char& secondaryStructure)
 {
     if (precalculations != nullptr) {
         return precalculations->_GetOverlappingBlocks(secondaryStructure);
@@ -80,7 +86,7 @@ vector<shared_ptr<OverlapBlock>>& Metric::GetOverlappingBlocks(const char& secon
     return _GetOverlappingBlocks(secondaryStructure);
 }
 
-vector<shared_ptr<SSBlock>>& Metric::GetNonOverlappingBlocks(const char& secondaryStructure)
+vector<SSBlock>& Metric::GetNonOverlappingBlocks(const char& secondaryStructure)
 {
     if (precalculations != nullptr) {
         return precalculations->_GetNonOverlappingBlocks(secondaryStructure);

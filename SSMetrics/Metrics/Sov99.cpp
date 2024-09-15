@@ -26,8 +26,8 @@ int Sov99::Delta(const OverlapBlock& overlapBlock) {
     vector<int> choices = {
         overlapBlock.GetLength() - OverlapLength(overlapBlock),
         OverlapLength(overlapBlock),
-        overlapBlock.refRegion->GetLength() / 2,
-        overlapBlock.predRegion->GetLength() / 2 };
+        overlapBlock.refRegion.GetLength() / 2,
+        overlapBlock.predRegion.GetLength() / 2 };
     return *min_element(choices.begin(), choices.end());
 }
 
@@ -35,26 +35,24 @@ int Sov99::N(const char& secondaryStructure) {
     int summation = 0;
     if (HasOverlappingBlocks(secondaryStructure)) {
         for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-            summation += blockPtr->refRegion->GetLength();
+            summation += blockPtr.refRegion.GetLength();
         }
     }
     if (HasNonOverlappingBlocks(secondaryStructure)) {
         for (const auto& blockPtr : GetNonOverlappingBlocks(secondaryStructure)) {
-            summation += blockPtr->GetLength();
+            summation += blockPtr.GetLength();
         }
     }
     return summation;
 }
 
-Sov99::Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
-    this->name = name;
+Sov99::Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated) : Metric(name, refSequence, predSequence, precalculated) {
     this->_zeroDelta = zeroDelta;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         if (HasOverlappingBlocks(secondaryStructure)) {
-            for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-                OverlapBlock block = *blockPtr;
-                summation += (OverlapLength(block) + Delta(block)) / static_cast<double>(block.GetLength()) * block.refRegion->GetLength();
+            for (const auto& block : GetOverlappingBlocks(secondaryStructure)) {
+                summation += (OverlapLength(block) + Delta(block)) / static_cast<double>(block.GetLength()) * block.refRegion.GetLength();
             }
         }
         this->partialComputation.try_emplace(secondaryStructure, summation);

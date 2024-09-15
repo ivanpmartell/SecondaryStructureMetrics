@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
-#include <memory>
+#include <unordered_set>
 #include "../../Regions/OverlapBlock.hpp"
 
 using namespace std;
@@ -13,20 +13,25 @@ private:
     int _refLength{0};
     int _predLength{0};
     unordered_set<char> _secondaryStructureClasses;
-    vector<shared_ptr<SSBlock>> _refBlocks;
-    vector<shared_ptr<SSBlock>> _predBlocks;
-    unordered_map<char, vector<shared_ptr<OverlapBlock>>> _overlappingBlocksSSMap;
-    unordered_map<char, vector<shared_ptr<SSBlock>>> _nonOverlappingBlocksSSMap;
+    vector<SSBlock> _refBlocks;
+    vector<SSBlock> _predBlocks;
+    unordered_map<char, vector<OverlapBlock>> _overlappingBlocksSSMap;
+    unordered_map<char, vector<SSBlock>> _nonOverlappingBlocksSSMap;
+
+    void CalculateBlocksForSequence(const string& sequence, vector<SSBlock>& sequenceBlocks);
+    void CalculateOverlappingBlocks(unordered_map<char, vector<OverlapBlock>>& overlappingBlocks, unordered_map<char, vector<SSBlock>>& nonOverlappingBlocks);
+    void AddBlockToOverlappingBlocks(unordered_map<char, vector<OverlapBlock>>& overlappingBlocks, const char& key, const OverlapBlock& block);
+    void AddBlockToNonOverlappingBlocks(unordered_map<char, vector<SSBlock>>& nonOverlappingBlocks, const char& key, const SSBlock& block);
 public:
     IMetric(const string& refSequence, const string& predSequence, const bool& calculate);
 
-    int& _GetRefLength();
-    int& _GetPredLength();
+    int _GetRefLength() const;
+    int _GetPredLength() const;
     unordered_set<char>& _GetSecondaryStructureClasses();
-    vector<shared_ptr<SSBlock>>& _GetRefBlocks();
-    vector<shared_ptr<SSBlock>>& _GetPredBlocks();
-    vector<shared_ptr<OverlapBlock>>& _GetOverlappingBlocks(const char& secondaryStructure);
-    vector<shared_ptr<SSBlock>>& _GetNonOverlappingBlocks(const char& secondaryStructure);
+    vector<SSBlock>& _GetRefBlocks();
+    vector<SSBlock>& _GetPredBlocks();
+    vector<OverlapBlock>& _GetOverlappingBlocks(const char& secondaryStructure);
+    vector<SSBlock>& _GetNonOverlappingBlocks(const char& secondaryStructure);
     int _GetOverlappingBlocksCount(const char& secondaryStructure);
     int _GetNonOverlappingBlocksCount(const char& secondaryStructure);
 

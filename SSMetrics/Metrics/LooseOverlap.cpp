@@ -7,7 +7,7 @@ double LooseOverlap::Theta(const OverlapBlock& overlapBlock, const char& seconda
     int overlapCount = OverlapLength(overlapBlock);
     if (secondaryStructure != 'C')
     {
-        if (overlapCount >= ceil(overlapBlock.refRegion->GetLength() / 2.0))
+        if (overlapCount >= ceil(overlapBlock.refRegion.GetLength() / 2.0))
             return 1;
         else
             return 0;
@@ -21,16 +21,14 @@ double LooseOverlap::Theta(const OverlapBlock& overlapBlock, const char& seconda
     }
 }
 
-LooseOverlap::LooseOverlap(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
-    this->name = name;
+LooseOverlap::LooseOverlap(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : Metric(name, refSequence, predSequence, precalculated) {
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         int refLen = 0;
         if (HasOverlappingBlocks(secondaryStructure)) {
-            for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-                OverlapBlock block = *blockPtr;
-                summation += Theta(block, secondaryStructure) * block.refRegion->GetLength();
-                refLen += block.refRegion->GetLength();
+            for (const auto& block : GetOverlappingBlocks(secondaryStructure)) {
+                summation += Theta(block, secondaryStructure) * block.refRegion.GetLength();
+                refLen += block.refRegion.GetLength();
             }
         }
         this->refLengthSSMap.try_emplace(secondaryStructure, refLen);

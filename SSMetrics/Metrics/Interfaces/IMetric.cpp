@@ -12,26 +12,21 @@ IMetric::IMetric(const string& refSequence, const string& predSequence, const bo
         throw runtime_error("Reference and predicted sequences are not the same length");
     }
 
-    auto refBlockResults = GetBlocksForSequence(refSequence);
-    this->_secondaryStructureClasses = refBlockResults.first;
-    this->_refBlocks = refBlockResults.second;
-
-    this->_predBlocks = GetBlocksForSequence(predSequence).second;
+    CalculateBlocksForSequence(refSequence, this->_refBlocks);
+    CalculateBlocksForSequence(predSequence, this->_predBlocks);
     
-    auto blockResults = CalculateOverlappingBlocks(_refBlocks, _predBlocks);
-    this->_overlappingBlocksSSMap = blockResults.first;
-    this->_nonOverlappingBlocksSSMap = blockResults.second;
+    CalculateOverlappingBlocks(this->_overlappingBlocksSSMap, this->_nonOverlappingBlocksSSMap);
 }
 
 int IMetric::_OverlapLength(const OverlapBlock& overlapBlock) {
-    return min(overlapBlock.refRegion->GetTo(), overlapBlock.predRegion->GetTo()) - max(overlapBlock.refRegion->GetFrom(), overlapBlock.predRegion->GetFrom()) + 1;
+    return min(overlapBlock.refRegion.GetTo(), overlapBlock.predRegion.GetTo()) - max(overlapBlock.refRegion.GetFrom(), overlapBlock.predRegion.GetFrom()) + 1;
 }
 
-int& IMetric::_GetRefLength() {
+int IMetric::_GetRefLength() const {
     return _refLength;
 }
 
-int& IMetric::_GetPredLength() {
+int IMetric::_GetPredLength() const {
     return _predLength;
 }
 
@@ -40,22 +35,22 @@ unordered_set<char>& IMetric::_GetSecondaryStructureClasses()
     return _secondaryStructureClasses;
 }
 
-vector<shared_ptr<SSBlock>>& IMetric::_GetRefBlocks()
+vector<SSBlock>& IMetric::_GetRefBlocks()
 {
     return _refBlocks;
 }
 
-vector<shared_ptr<SSBlock>>& IMetric::_GetPredBlocks()
+vector<SSBlock>& IMetric::_GetPredBlocks()
 {
     return _predBlocks;
 }
 
-vector<shared_ptr<OverlapBlock>>& IMetric::_GetOverlappingBlocks(const char& secondaryStructure)
+vector<OverlapBlock>& IMetric::_GetOverlappingBlocks(const char& secondaryStructure)
 {
     return _overlappingBlocksSSMap[secondaryStructure];
 }
 
-vector<shared_ptr<SSBlock>>& IMetric::_GetNonOverlappingBlocks(const char& secondaryStructure)
+vector<SSBlock>& IMetric::_GetNonOverlappingBlocks(const char& secondaryStructure)
 {
     return _nonOverlappingBlocksSSMap[secondaryStructure];
 }
@@ -75,5 +70,94 @@ int IMetric::_GetNonOverlappingBlocksCount(const char& secondaryStructure)
         return _nonOverlappingBlocksSSMap[secondaryStructure].size();
     else {
         return 0;
+    }
+}
+
+void IMetric::CalculateBlocksForSequence(const string& sequence, vector<SSBlock>& sequenceBlocks) {
+    char secondaryStructure = sequence[0];
+    SSBlock ssBlock = SSBlock(0, 0, secondaryStructure);
+    SSBlock& prevBlock = ssBlock;
+    for (int i = 1; i < sequence.size(); i++)
+    {
+        char currentChar = sequence[i];
+        if (sequence[i - 1] == currentChar)
+        {
+            prevBlock.SetTo(i);
+        }
+        else
+        {
+            sequenceBlocks.emplace_back(prevBlock);
+            prevBlock = SSBlock(i, i, currentChar);
+        }
+    }
+    sequenceBlocks.emplace_back(prevBlock);
+}
+
+
+void IMetric::AddBlockToOverlappingBlocks(unordered_map<char, vector<OverlapBlock>>& overlappingBlocks, const char& key, const OverlapBlock& block) {
+    if (overlappingBlocks.contains(key))
+        overlappingBlocks[key].emplace_back(block);
+    else
+    {
+        vector<OverlapBlock> blocks;
+        blocks.emplace_back(block);
+        overlappingBlocks.try_emplace(key, blocks);
+    }
+}
+
+void IMetric::AddBlockToNonOverlappingBlocks(unordered_map<char, vector<SSBlock>>& nonOverlappingBlocks, const char& key, const SSBlock& block) {
+    if (nonOverlappingBlocks.contains(key))
+        nonOverlappingBlocks[key].emplace_back(block);
+    else
+    {
+        vector<SSBlock> blocks;
+        blocks.emplace_back(block);
+        nonOverlappingBlocks.try_emplace(key, blocks);
+    }
+}
+
+void IMetric::CalculateOverlappingBlocks(unordered_map<char, vector<OverlapBlock>>& overlappingBlocks, unordered_map<char, vector<SSBlock>>& nonOverlappingBlocks) {
+    auto& refBlocks = this->_refBlocks;
+    auto& predBlocks = this->_predBlocks;
+    auto iterRefBlocks = refBlocks.begin();
+    auto iterPredBlocks = predBlocks.begin();
+
+    bool hadOverlap = false;
+    while (iterRefBlocks != refBlocks.end() || iterPredBlocks != predBlocks.end())
+    {
+        SSBlock currentRefBlock = *iterRefBlocks;
+        SSBlock currentPredBlock = *iterPredBlocks;
+        int predFrom = currentPredBlock.GetFrom();
+        int predTo = currentPredBlock.GetTo();
+        int refFrom = currentRefBlock.GetFrom();
+        int refTo = currentRefBlock.GetTo();
+        char refSS = currentRefBlock.GetSecondaryStructure();
+        char predSS = currentPredBlock.GetSecondaryStructure();
+        this->_secondaryStructureClasses.insert(refSS);
+
+        if (refSS == predSS) {
+            hadOverlap = true;
+            OverlapBlock overlapBlock = OverlapBlock(currentRefBlock, currentPredBlock);
+            AddBlockToOverlappingBlocks(overlappingBlocks, refSS, overlapBlock);
+        }
+
+        if (refTo == predTo) {
+            if (!hadOverlap) {
+                AddBlockToNonOverlappingBlocks(nonOverlappingBlocks, refSS, currentRefBlock);
+            }
+            iterRefBlocks++;
+            iterPredBlocks++;
+            hadOverlap = false;
+        }
+        else if (refTo < predTo) {
+            if (!hadOverlap) {
+                AddBlockToNonOverlappingBlocks(nonOverlappingBlocks, refSS, currentRefBlock);
+            }
+            iterRefBlocks++;
+            hadOverlap = false;
+        }
+        else {
+            iterPredBlocks++;
+        }
     }
 }

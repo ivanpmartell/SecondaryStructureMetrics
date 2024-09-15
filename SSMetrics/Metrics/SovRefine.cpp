@@ -33,7 +33,7 @@ int SovRefine::GetNormalization(const char& secondaryStructure)
 double SovRefine::Delta(const OverlapBlock& overlapBlock) {
     if (GetZeroDelta())
         return 0;
-    double deltaVal = GetDeltaAll() * (overlapBlock.refRegion->GetLength() / (double)GetRefLength()) * (OverlapLength(overlapBlock) / (double)overlapBlock.GetLength());
+    double deltaVal = GetDeltaAll() * (overlapBlock.refRegion.GetLength() / (double)GetRefLength()) * (OverlapLength(overlapBlock) / (double)overlapBlock.GetLength());
     int threshold = overlapBlock.GetLength() - OverlapLength(overlapBlock);
     if (deltaVal > threshold) { 
         return threshold;
@@ -44,11 +44,8 @@ double SovRefine::Delta(const OverlapBlock& overlapBlock) {
 double SovRefine::DeltaAll()
 {
     double summation = 0;
-    for (const auto& blockPtr : GetRefBlocks()) {
-        if (blockPtr == nullptr) {
-            break;
-        }
-        summation += pow(blockPtr->GetLength() / (double)GetRefLength(), 2);
+    for (const auto& block : GetRefBlocks()) {
+        summation += pow(block.GetLength() / (double)GetRefLength(), 2);
     }
     return GetLambda() * (GetSecondaryStructureClasses().size() / summation);
 }
@@ -56,32 +53,27 @@ double SovRefine::DeltaAll()
 int SovRefine::N(const char& secondaryStructure) {
     int summation = 0;
     if (HasOverlappingBlocks(secondaryStructure)) {
-        for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-            summation += blockPtr->refRegion->GetLength();
+        for (const auto& block : GetOverlappingBlocks(secondaryStructure)) {
+            summation += block.refRegion.GetLength();
         }
     }
     if (HasNonOverlappingBlocks(secondaryStructure)) {
-        for (const auto& blockPtr : GetNonOverlappingBlocks(secondaryStructure)) {
-            if (blockPtr == nullptr) {
-                break;
-            }
-            summation += blockPtr->GetLength();
+        for (const auto& block : GetNonOverlappingBlocks(secondaryStructure)) {
+            summation += block.GetLength();
         }
     }
     return summation;
 }
 
-SovRefine::SovRefine(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, const double& lambda, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
-    this->name = name;
+SovRefine::SovRefine(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, const double& lambda, PrecalculatedMetric* precalculated) : Metric(name, refSequence, predSequence, precalculated) {
     this->_zeroDelta = zeroDelta;
     this->_lambda = lambda;
     _deltaAll = DeltaAll();
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
         if (HasOverlappingBlocks(secondaryStructure)) {
-            for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-                OverlapBlock block = *blockPtr;
-                summation += (OverlapLength(block) + Delta(block)) / static_cast<double>(block.GetLength()) * block.refRegion->GetLength();
+            for (const auto& block : GetOverlappingBlocks(secondaryStructure)) {
+                summation += (OverlapLength(block) + Delta(block)) / static_cast<double>(block.GetLength()) * block.refRegion.GetLength();
             }
         }
         this->partialComputation.try_emplace(secondaryStructure, summation);

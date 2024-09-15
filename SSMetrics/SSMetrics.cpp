@@ -77,10 +77,11 @@ void run(string& metricName, const string& reference, const string& predicted, c
     vector<Metric*> calculatedMetrics = GetMetricsToCalculate(metricName, refSequence, predSequence, lambda, zeroDelta, precalculation);
     for (Metric* metricPtr : calculatedMetrics) {
         Metric& metric = *metricPtr;
+        string& mName = metric.GetName();
         for (const auto& secondaryStructure : metric.GetSecondaryStructureClasses()) {
-            fmt::print("{0}_i\t{1}\t{2:.3f}\n", metric.name, secondaryStructure, metric.CalculateOneClass(secondaryStructure));
+            fmt::print("{0}_i\t{1}\t{2:.3f}\n", mName, secondaryStructure, metric.CalculateOneClass(secondaryStructure));
         }
-        fmt::print("{0}\t{1:.3f}\n", metric.name, metric.CalculateAllClasses());
+        fmt::print("{0}\t{1:.3f}\n", mName, metric.CalculateAllClasses());
         delete metricPtr;
     }
     calculatedMetrics.clear();

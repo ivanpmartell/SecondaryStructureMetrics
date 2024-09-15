@@ -2,16 +2,14 @@
 
 using namespace std;
 
-Accuracy::Accuracy(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : Metric(refSequence, predSequence, precalculated) {
-    this->name = name;
+Accuracy::Accuracy(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : Metric(name, refSequence, predSequence, precalculated) {
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         int summation = 0;
         int refLen = 0;
         if (HasOverlappingBlocks(secondaryStructure)) {
-            for (const auto& blockPtr : GetOverlappingBlocks(secondaryStructure)) {
-                OverlapBlock block = *blockPtr;
+            for (const auto& block : GetOverlappingBlocks(secondaryStructure)) {
                 summation += OverlapLength(block);
-                refLen += block.refRegion->GetLength();
+                refLen += block.refRegion.GetLength();
             }
         }
         this->refLengthSSMap.try_emplace(secondaryStructure, refLen);
