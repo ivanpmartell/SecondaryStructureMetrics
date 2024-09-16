@@ -44,8 +44,9 @@ double SovRefine::Delta(const OverlapBlock& overlapBlock) {
 double SovRefine::DeltaAll()
 {
     double summation = 0;
+    double refLength = (double)GetRefLength();
     for (const auto& block : GetRefBlocks()) {
-        summation += pow(block.GetLength() / (double)GetRefLength(), 2);
+        summation += pow(block.GetLength() / refLength, 2);
     }
     return GetLambda() * (GetSecondaryStructureClasses().size() / summation);
 }

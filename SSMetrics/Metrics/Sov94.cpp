@@ -36,9 +36,9 @@ Sov94::Sov94(const string& name, const string& refSequence, const string& predSe
 double Sov94::CalculateAllClasses() {
     double summation = 0;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
-        summation += GetPartialComputation(secondaryStructure) / GetRefLength();
+        summation += GetPartialComputation(secondaryStructure);
     }
-    return summation;
+    return summation / GetRefLength();
 }
 
 double Sov94::CalculateOneClass(const char& secondaryStructure) {

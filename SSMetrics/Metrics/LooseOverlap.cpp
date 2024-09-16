@@ -39,9 +39,9 @@ LooseOverlap::LooseOverlap(const string& name, const string& refSequence, const 
 double LooseOverlap::CalculateAllClasses() {
     double summation = 0;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
-        summation += GetPartialComputation(secondaryStructure) / GetRefLength();
+        summation += GetPartialComputation(secondaryStructure);
     }
-    return summation;
+    return summation / GetRefLength();
 }
 
 double LooseOverlap::CalculateOneClass(const char& secondaryStructure) {

@@ -57,9 +57,9 @@ StrictOverlap::StrictOverlap(const string& name, const string& refSequence, cons
 double StrictOverlap::CalculateAllClasses() {
     double summation = 0;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
-        summation += GetPartialComputation(secondaryStructure) / GetRefLength();
+        summation += GetPartialComputation(secondaryStructure);
     }
-    return summation;
+    return summation / GetRefLength();
 }
 
 double StrictOverlap::CalculateOneClass(const char& secondaryStructure) {
