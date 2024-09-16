@@ -5,7 +5,7 @@
 
 using namespace std;
 
-vector<Metric*> GetMetricsToCalculate(const string& metricName, const string& refSequence, const string& predSequence, const double& lambda, const bool& zeroDelta, PrecalculatedMetric* precalculation) {
+static vector<Metric*> GetMetricsToCalculate(const string& metricName, const string& refSequence, const string& predSequence, const double& lambda, const bool& zeroDelta, PrecalculatedMetric* precalculation) {
     vector<Metric*> metrics;
     const MetricChoice& metricEnum = GetEnumFromString(metricName);
     switch (metricEnum) {
@@ -60,11 +60,11 @@ vector<Metric*> GetMetricsToCalculate(const string& metricName, const string& re
     return metrics;
 }
 
-void run(string& metricName, const string& reference, const string& predicted, const double& lambda, const bool& zeroDelta, const bool& useFasta) {
+static void run(string& metricName, const string& reference, const string& predicted, const double& lambda, const bool& zeroDelta) {
     transform(metricName.begin(), metricName.end(), metricName.begin(), [](unsigned char c){ return std::tolower(c); });
     
     string refSequence, predSequence;
-    if (useFasta) {
+    if (reference.ends_with(".fa") || reference.ends_with(".fasta")) {
         refSequence = ReadSingleEntryFastaSequence(reference);
         predSequence = ReadSingleEntryFastaSequence(predicted);
     }
@@ -95,11 +95,9 @@ int main(int argc, char **argv) {
     string reference, predicted;
     double lambda = 1.0;
     bool zeroDelta = false;
-    bool useFasta = false;
-    app.add_flag("-f,--fasta", useFasta, "Reference and predicted sequences are taken as fasta files");
-    app.add_option("-r,--reference", reference, "Path to the reference sequence")
+    app.add_option("-r,--reference", reference, "Reference sequence (Fasta file also accepted)")
         -> required();
-    app.add_option("-p,--predicted", predicted, "Path to the predicted sequence")
+    app.add_option("-p,--predicted", predicted, "Predicted sequence (Fasta file also accepted)")
         -> required();
     app.add_option("-m,--metric", metricName, "Name of the metric to calculate. Ignore to calculate all metrics.\nMetric Choices: Accuracy, SOV94, SOV99, SOVrefine, LooseOverlap, StrictOverlap");
     app.add_option("-l,--lambda", lambda, "Adjustable scale parameter for SOVrefine");
@@ -107,7 +105,7 @@ int main(int argc, char **argv) {
     CLI11_PARSE(app, argc, argv);
 
     try {
-        run(metricName, reference, predicted, lambda, zeroDelta, useFasta);
+        run(metricName, reference, predicted, lambda, zeroDelta);
         return 0;
     }
     catch (const exception& e) {
