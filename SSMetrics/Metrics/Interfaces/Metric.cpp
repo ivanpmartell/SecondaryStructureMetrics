@@ -36,30 +36,10 @@ unordered_set<char>& Metric::GetSecondaryStructureClasses()
 
 int Metric::GetRefLength(const char& secondaryStructure)
 {
-    if (refLengthSSMap.contains(secondaryStructure))
-    {
-        int value = refLengthSSMap[secondaryStructure];
-        if (value < 1)
-            return 1;
-        else
-            return refLengthSSMap[secondaryStructure];
+    if (precalculations != nullptr) {
+        return precalculations->_GetRefLength(secondaryStructure);
     }
-    else
-        return 1;
-}
-
-int Metric::GetPredLength(const char& secondaryStructure)
-{
-    if (predLengthSSMap.contains(secondaryStructure))
-    {
-        int value = predLengthSSMap[secondaryStructure];
-        if (value < 1)
-            return 1;
-        else
-            return predLengthSSMap[secondaryStructure];
-    }
-    else
-        return 1;
+    return _GetRefLength(secondaryStructure);
 }
 
 vector<SSBlock>& Metric::GetRefBlocks()

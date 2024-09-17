@@ -42,14 +42,11 @@ StrictOverlap::StrictOverlap(const string& name, const string& refSequence, cons
     this->_zeroDelta = zeroDelta;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
-        int refLen = 0;
         if (HasOverlappingBlocks(secondaryStructure)) {
             for (const auto& block : GetOverlappingBlocks(secondaryStructure)) {
                 summation += Theta(block) * block.refRegion.GetLength();
-                refLen += block.refRegion.GetLength();
             }
         }
-        this->refLengthSSMap.try_emplace(secondaryStructure, refLen);
         this->partialComputation.try_emplace(secondaryStructure, summation);
     }
 }

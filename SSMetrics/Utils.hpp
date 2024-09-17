@@ -1,20 +1,23 @@
 #pragma once
 
-#include <unordered_map>
-#include <string>
 #include <fstream>
+#include <iostream>
+#include <filesystem>
+#include <fmt/format.h>
 
-enum class MetricChoice
+class FastaReader
 {
-    Unknown,
-    All,
-    Accuracy,
-    Sov94,
-    Sov99,
-    SovRefine,
-    LooseOverlap,
-    StrictOverlap
-};
+private:
+    std::ifstream _fastaFileStream;
+    std::string _currentSequence{""};
+    std::string _currentId{""};
+    std::string _currentDescription{""};
+public:
+    bool ReadNextSequence();
+    std::string& GetSequence();
+    std::string& GetId();
+    std::string& GetDescription();
 
-MetricChoice GetEnumFromString(const std::string& input);
-std::string ReadSingleEntryFastaSequence(const std::string& filename);
+    FastaReader(std::string input);
+    ~FastaReader();
+};

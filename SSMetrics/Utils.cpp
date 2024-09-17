@@ -2,43 +2,71 @@
 
 using namespace std;
 
-static const unordered_map<string,MetricChoice> strToMetricMap = { {"accuracy",MetricChoice::Accuracy}, {"sov94",MetricChoice::Sov94}, {"sov99", MetricChoice::Sov99},
-    {"sovrefine",MetricChoice::SovRefine}, {"looseoverlap",MetricChoice::LooseOverlap}, {"strictoverlap", MetricChoice::StrictOverlap}, {"all", MetricChoice::All } };
+FastaReader::FastaReader(string input) {
+    // http://stackoverflow.com/questions/5166263/how-to-get-iostream-to-perform-better
+    setlocale(LC_ALL,"C");
+    ios_base::sync_with_stdio(false);
 
-MetricChoice GetEnumFromString(const string& input) {
-    auto it = strToMetricMap.find(input);
-    if (it != strToMetricMap.end()) {
-      return it->second;
+    if (filesystem::is_directory(input)) {
+        throw runtime_error(fmt::format("Input is a directory: {}", input));
     }
-    else { 
-        return MetricChoice::Unknown;
+    _fastaFileStream.open(input.c_str(), ios::in);
+    if (!_fastaFileStream.is_open()) {
+        throw runtime_error(fmt::format("Could not read file: {}", input));
     }
 }
 
-string ReadSingleEntryFastaSequence(const string& filename) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        throw runtime_error("Input is not a file: " + filename);
+FastaReader::~FastaReader()
+{
+    if (_fastaFileStream.is_open()) {
+        _fastaFileStream.close();
+    }
+}
+
+bool FastaReader::ReadNextSequence()
+{
+    _currentId.clear();
+    _currentDescription.clear();
+    _currentSequence.clear();
+    char firstChar = _fastaFileStream.peek();
+    if (firstChar != '>' || _fastaFileStream.eof()) {
+        return false;
+    }
+    string header;
+    getline(_fastaFileStream, header);
+    if (header.length() != 0) {
+        size_t separator = header.find(" ");
+        if (separator != string::npos) {
+            _currentId = header.substr(0, separator);
+            _currentDescription = header.substr(++separator);
+        } else {
+            _currentId = header;
+        }
     }
     string line;
-    getline(file, line);
-    if (line[0] != '>') {
-        file.close();
-        throw runtime_error("Incorrectly formatted fasta file: " + filename);
-    }
-
-    string sequence;
-    while (getline(file, line)) {
-        if (line[0] == '>') {
-            file.close();
-            throw runtime_error("Not a single entry fasta file: " + filename);
+    while ('>' != _fastaFileStream.peek()) {
+        if (!getline(_fastaFileStream, line) || line.empty()) {
+            break;
         }
-        if (line.empty()) {
-            continue;
-        }
-        sequence += line;
+        _currentSequence += line;
     }
-    file.close();
+    if(_currentSequence.empty()) {
+        throw runtime_error("Input file format is incorrect: Contains empty record sequence");
+    }
+    return true;
+}
 
-    return sequence;
+string& FastaReader::GetSequence()
+{
+    return _currentSequence;
+}
+
+string& FastaReader::GetId()
+{
+    return _currentId;
+}
+
+string& FastaReader::GetDescription()
+{
+    return _currentDescription;
 }
