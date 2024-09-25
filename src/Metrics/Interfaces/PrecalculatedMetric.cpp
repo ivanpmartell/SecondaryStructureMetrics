@@ -1,4 +1,4 @@
-#include "PrecalculatedMetric.hpp"
+#include "../include/Interfaces/PrecalculatedMetric.hpp"
 
 PrecalculatedMetric::PrecalculatedMetric(const string& refSequence, const string& predSequence) : IMetric(refSequence, predSequence, true) { }
 

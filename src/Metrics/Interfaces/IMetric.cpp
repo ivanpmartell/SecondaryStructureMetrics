@@ -1,4 +1,4 @@
-#include "IMetric.hpp"
+#include "../include/Interfaces/IMetric.hpp"
 
 IMetric::IMetric(const string& refSequence, const string& predSequence, const bool& calculate) {
     if (!calculate)
@@ -87,7 +87,7 @@ void IMetric::CalculateBlocksForSequence(const string& sequence, vector<SSBlock>
     char secondaryStructure = sequence[0];
     SSBlock ssBlock = SSBlock(0, 0, secondaryStructure);
     SSBlock& prevBlock = ssBlock;
-    for (int i = 1; i < sequence.size(); i++) {
+    for (unsigned long long i = 1; i < sequence.size(); i++) {
         char currentChar = sequence[i];
         if (sequence[i - 1] == currentChar) {
             prevBlock.SetTo(i);

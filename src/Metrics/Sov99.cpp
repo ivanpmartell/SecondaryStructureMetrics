@@ -1,23 +1,24 @@
-#include "Sov94.hpp"
+#include "include/Sov99.hpp"
 
 using namespace std;
 
-bool Sov94::GetZeroDelta() const
+bool Sov99::GetZeroDelta() const
 {
     return _zeroDelta;
 }
 
-int Sov94::Delta(const OverlapBlock& overlapBlock) {
+int Sov99::Delta(const OverlapBlock& overlapBlock) {
     if (GetZeroDelta())
         return 0;
     vector<int> choices = {
         overlapBlock.GetLength() - OverlapLength(overlapBlock),
         OverlapLength(overlapBlock),
-        overlapBlock.refRegion.GetLength() / 2 };
+        overlapBlock.refRegion.GetLength() / 2,
+        overlapBlock.predRegion.GetLength() / 2 };
     return *min_element(choices.begin(), choices.end());
 }
 
-Sov94::Sov94(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedMetric* precalculated) : Metric(name, refSequence, predSequence, precalculated) {
+Sov99::Sov99(const string& name, const string& refSequence, const string& predSequence, const bool& zeroDelta, PrecalculatedNormMetric* precalculatedNorm, PrecalculatedMetric* precalculated) : NormMetric(name, refSequence, predSequence, precalculatedNorm, precalculated) {
     this->_zeroDelta = zeroDelta;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         double summation = 0;
@@ -30,14 +31,14 @@ Sov94::Sov94(const string& name, const string& refSequence, const string& predSe
     }
 }
 
-double Sov94::CalculateAllClasses() {
+double Sov99::CalculateAllClasses() {
     double summation = 0;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
         summation += GetPartialComputation(secondaryStructure);
     }
-    return summation / GetRefLength();
+    return summation / GetNormalizationSum();
 }
 
-double Sov94::CalculateOneClass(const char& secondaryStructure) {
-    return GetPartialComputation(secondaryStructure) / GetRefLength(secondaryStructure);
+double Sov99::CalculateOneClass(const char& secondaryStructure) {
+    return GetPartialComputation(secondaryStructure) / GetNormalization(secondaryStructure);
 }

@@ -1,4 +1,4 @@
-#include "NormMetric.hpp"
+#include "../include/Interfaces/NormMetric.hpp"
 
 int NormMetric::GetNormalizationSum() const
 {

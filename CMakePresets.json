@@ -63,15 +63,11 @@
       }
     },
     {
-      "name": "linux-debug",
-      "displayName": "Linux Debug",
+      "name": "linux-base",
+      "hidden": true,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "installDir": "${sourceDir}/out/install/${presetName}",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_TOOLCHAIN_FILE": "/opt/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -84,24 +80,21 @@
       }
     },
     {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_TOOLCHAIN_FILE": "/opt/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
       "name": "linux-release",
       "displayName": "Linux Release",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "installDir": "${sourceDir}/out/install/${presetName}",
+      "inherits": "linux-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_TOOLCHAIN_FILE": "/opt/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
-          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
-        }
       }
     },
     {
@@ -122,6 +115,15 @@
       "configurePreset": "actions-release",
       "displayName": "Build (Release)",
       "description": "Build with Ninja/vcpkg (Release)",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "run-tests",
+      "configurePreset": "actions-release",
+      "displayName": "Run Unit Tests",
+      "description": "Use CTest to validate calculations",
       "configuration": "Release"
     }
   ]

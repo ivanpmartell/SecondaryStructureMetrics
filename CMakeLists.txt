@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : Top-level CMake project file, do global configuration
 # and include sub-projects here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.14)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -10,12 +10,13 @@ if (POLICY CMP0141)
 endif()
 
 # Statically link libraries
-if (NOT APPLE)
+if (LINUX)
   set(BUILD_SHARED_LIBS OFF)
   set(CMAKE_EXE_LINKER_FLAGS "-static")
 endif()
 
-project ("SSMetrics")
-
 # Include sub-projects.
-add_subdirectory ("SSMetrics")
+add_subdirectory ("src")
+
+enable_testing()
+add_subdirectory ("test")

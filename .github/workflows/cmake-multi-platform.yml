@@ -61,7 +61,7 @@ jobs:
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
       TOOLCHAIN_PATH: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-      ARTIFACTS_PATH: ${{ github.workspace }}/out/build/actions-release/SSMetrics
+      ARTIFACTS_PATH: ${{ github.workspace }}/out/build/actions-release/src/CLI
 
     steps:
       - uses: actions/checkout@v4
@@ -77,12 +77,13 @@ jobs:
         with:
           vcpkgDirectory: ${{ github.workspace }}/vcpkg
 
-      - name: Build project
+      - name: Build project and run tests
         uses: lukka/run-cmake@v10
         id: runcmake
         with:
           configurePreset: 'actions-release'
           buildPreset: 'ninja-vcpkg-release'
+          testPreset: 'run-tests'
 
       - name: Zip build artifacts
         uses: thedoctor0/zip-release@0.7.6
@@ -90,7 +91,7 @@ jobs:
           type: 'zip'
           filename: ${{ matrix.triplet }}.zip
           directory: ${{ env.ARTIFACTS_PATH }}
-          path: SSMetrics*
+          path: ssmetrics* fmtd*
 
       - name: Upload zipped artifact
         uses: actions/upload-release-asset@v1

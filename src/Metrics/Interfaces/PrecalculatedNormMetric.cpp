@@ -1,4 +1,4 @@
-#include "PrecalculatedNormMetric.hpp"
+#include "../include/Interfaces/PrecalculatedNormMetric.hpp"
 
 PrecalculatedNormMetric::PrecalculatedNormMetric(const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : INormMetric("precalc", refSequence, predSequence, true, precalculated) { }
 

@@ -1,4 +1,4 @@
-#include "INormMetric.hpp"
+#include "../include/Interfaces/INormMetric.hpp"
 
 using namespace std;
 

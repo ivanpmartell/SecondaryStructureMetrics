@@ -1,7 +1,7 @@
-﻿// SSMetrics.cpp : Defines the entry point for the application.
+﻿// App.cpp : Defines the entry point for the application.
 //
 
-#include "SSMetrics.hpp"
+#include "App.hpp"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ static vector<Metric*> GetMetricsToCalculate(string& metricName, const string& r
         LooseOverlap* looseOverlap = new LooseOverlap("LooseOverlap", refSequence, predSequence, precalculation);
         StrictOverlap* strictOverlap = new StrictOverlap("StrictOverlap", refSequence, predSequence, zeroDelta, precalculation);
         Accuracy* accuracy = new Accuracy("Accuracy", refSequence, predSequence, precalculation);
-        Sov94* sov94 = new Sov94("Sov_94", refSequence, predSequence, zeroDelta, precalculation);
+        Sov94* sov94 = new Sov94("Sov_94", refSequence, predSequence, zeroDelta, false, precalculation);
         Sov99* sov99 = new Sov99("Sov_99", refSequence, predSequence, zeroDelta, normPrecalculation, precalculation);
         SovRefine* sovRefine = new SovRefine("SovRefine", refSequence, predSequence, zeroDelta, lambda, normPrecalculation, precalculation);
         metrics.push_back(looseOverlap);
@@ -40,7 +40,7 @@ static vector<Metric*> GetMetricsToCalculate(string& metricName, const string& r
         return metrics;
     }
     else if (metricName == "Sov94") {
-        Sov94* sov94 = new Sov94("Sov_94", refSequence, predSequence, zeroDelta, precalculation);
+        Sov94* sov94 = new Sov94("Sov_94", refSequence, predSequence, zeroDelta, false, precalculation);
         metrics.push_back(sov94);
         return metrics;
     }

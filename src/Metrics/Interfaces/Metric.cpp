@@ -1,4 +1,4 @@
-#include "Metric.hpp"
+#include "../include/Interfaces/Metric.hpp"
 
 Metric::Metric(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated) : IMetric(refSequence, predSequence, precalculated == nullptr) {
     this->precalculations = precalculated;
