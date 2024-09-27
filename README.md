@@ -81,7 +81,7 @@ This will include the executable file ready to be used in your machine.
 
 ```
 Secondary structure metric calculator
-Usage: ./SSMetrics [OPTIONS]
+Usage: ./ssmetrics [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit
@@ -98,7 +98,7 @@ Options:
 ## Example
 
 ```
-./SSMetrics -r CCHHHHHCCC -p CCCHHHHHCC
+./ssmetrics -r CCHHHHHCCC -p CCCHHHHHCC
 ```
 
 # Validation
@@ -116,4 +116,6 @@ This application was created as an improvement of previously existing PSSP metri
 Most notably, our app improves the calculation speed of all metrics over the SOV_refine.pl script from the SOV_refine paper.
 This performance improvement is important when calculating metrics for long sequences and also when the metrics need to be obtained for many sequences.
 
-TODO: Image of quadratic performance of perl script vs linear performance of this application.
+The results shown below were obtained using the `docs/perf_comparison.sh` script. Lower is better.
+
+![Performance](docs/performance.png)
