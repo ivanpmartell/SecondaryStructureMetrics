@@ -18,6 +18,8 @@ public:
     std::string& GetId();
     std::string& GetDescription();
 
-    FastaReader(std::string input);
+    FastaReader(std::string const & input);
     ~FastaReader();
 };
+
+bool HasFastaEnding(std::string const & value);

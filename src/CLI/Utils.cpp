@@ -2,7 +2,7 @@
 
 using namespace std;
 
-FastaReader::FastaReader(string input) {
+FastaReader::FastaReader(string const & input) {
     // http://stackoverflow.com/questions/5166263/how-to-get-iostream-to-perform-better
     setlocale(LC_ALL,"C");
     ios_base::sync_with_stdio(false);
@@ -69,4 +69,28 @@ string& FastaReader::GetId()
 string& FastaReader::GetDescription()
 {
     return _currentDescription;
+}
+
+bool HasFastaEnding(string const & value)
+{
+    string fastaFormat = ".fasta";
+    string fasFormat = ".fas";
+    string faaFormat = ".faa";
+    string fnaFormat = ".fna";
+    string txtFormat = ".txt";
+    string faFormat = ".fa";
+    if (value.size() > fastaFormat.size()) {
+        return equal(faFormat.rbegin(), faFormat.rend(), value.rbegin()) || equal(fasFormat.rbegin(), fasFormat.rend(), value.rbegin()) ||
+            equal(faaFormat.rbegin(), faaFormat.rend(), value.rbegin()) || equal(fnaFormat.rbegin(), fnaFormat.rend(), value.rbegin()) ||
+            equal(txtFormat.rbegin(), txtFormat.rend(), value.rbegin()) || equal(fastaFormat.rbegin(), fastaFormat.rend(), value.rbegin());
+    }
+    else if (value.size() > fasFormat.size()) {
+        return equal(faFormat.rbegin(), faFormat.rend(), value.rbegin()) || equal(fasFormat.rbegin(), fasFormat.rend(), value.rbegin()) ||
+            equal(faaFormat.rbegin(), faaFormat.rend(), value.rbegin()) || equal(fnaFormat.rbegin(), fnaFormat.rend(), value.rbegin()) ||
+            equal(txtFormat.rbegin(), txtFormat.rend(), value.rbegin());
+    }
+    else if (value.size() > faFormat.size()) {
+        return equal(faFormat.rbegin(), faFormat.rend(), value.rbegin());
+    }
+    return false;
 }
