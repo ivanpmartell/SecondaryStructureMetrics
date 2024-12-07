@@ -5,7 +5,7 @@
 class SSBlock : public Region
 {
 private:
-    char _ssClass;
+    char _ssClass{' '};
 public:
     SSBlock() = default;
     SSBlock(const int& from, const int& to, const char& secondaryStructure);

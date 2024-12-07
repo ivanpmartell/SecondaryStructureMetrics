@@ -1,4 +1,4 @@
-#include "Utils.hpp"
+#include "include/Utils.hpp"
 
 using namespace std;
 
@@ -93,4 +93,10 @@ bool HasFastaEnding(string const & value)
         return equal(faFormat.rbegin(), faFormat.rend(), value.rbegin());
     }
     return false;
+}
+
+void CheckFile(const string& inputName, const string& path) {
+    if (!filesystem::exists(path)) {
+        throw runtime_error("Input for " + inputName + " is not a file. Did you mean to input a sequence? If so, remove the -f flag");
+    }
 }

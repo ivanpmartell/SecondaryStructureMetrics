@@ -23,3 +23,4 @@ public:
 };
 
 bool HasFastaEnding(std::string const & value);
+void CheckFile(const std::string& inputName, const std::string& path);
