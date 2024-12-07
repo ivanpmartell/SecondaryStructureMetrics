@@ -25,7 +25,9 @@ string MutAccuracy::ResultVectorToSequence(const vector<string>& result) {
 MutAccuracy::MutAccuracy(const string& name, const string& consensusRef, const string& mutatedRef, const string& consensusPred, const string& mutatedPred) : MutMetric(name) {
     _refResult = CreateResultingSequence(consensusRef, mutatedRef);
     _predResult = CreateResultingSequence(consensusPred, mutatedPred);
-    
+    if (_refResult.size() != _predResult.size()) {
+        throw runtime_error("Reference and predicted sequences are not the same length");
+    }
     SetResultingRefSequence(ResultVectorToSequence(_refResult));
     SetResultingPredSequence(ResultVectorToSequence(_predResult));
 }
