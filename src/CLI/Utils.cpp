@@ -37,10 +37,10 @@ bool FastaReader::ReadNextSequence()
     if (header.length() != 0) {
         size_t separator = header.find(" ");
         if (separator != string::npos) {
-            _currentId = header.substr(0, separator);
+            _currentId = header.substr(1, separator - 1);
             _currentDescription = header.substr(++separator);
         } else {
-            _currentId = header;
+            _currentId = header.substr(1, header.size() - 1);
         }
     }
     string line;
