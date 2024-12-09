@@ -79,26 +79,88 @@ This will include the executable file ready to be used in your machine.
 
 # Usage
 
+There are three metric calculators that can be utilized, each in it's own sub-module which can be accesssed by a subcommand.
+The main module allows use of sequences (default) or fasta files as input.
+
 ```
-Secondary structure metric calculator
-Usage: ./ssmetrics [OPTIONS]
+Protein structure metric calculator
+Usage: ./ssmetrics [OPTIONS] [SUBCOMMAND]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -f,--fasta                  Reference and predicted inputs are taken as fasta file paths
+
+Subcommands:
+  2d                          Calculate secondary structure metrics
+  mutational                  Calculate mutational metrics
+  binary                      Calculate two-class statistical metrics
+```
+
+The secondary structure metrics sub-module accessed by the `2d` subcommand:
+
+```
+Calculate secondary structure metrics
+Usage: ./ssmetrics 2d [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit
   -r,--reference TEXT REQUIRED
-                              Reference sequence (Fasta file also accepted)
+                              Reference sequence (Add -f for fasta files)
   -p,--predicted TEXT REQUIRED
-                              Predicted sequence (Fasta file also accepted)
+                              Predicted sequence (Add -f for fasta files)
   -m,--metric TEXT            Name of the metric to calculate. Ignore to calculate all metrics.
                               Metric Choices: Accuracy, SOV94, SOV99, SOVrefine, LooseOverlap, StrictOverlap
   -l,--lambda FLOAT           Adjustable scale parameter for SOVrefine
   -z,--zeroDelta              This will omit the delta value (delta = 0)
 ```
 
-## Example
+The mutational metrics sub-module accessed by the `mutational` subcommand:
 
 ```
-./ssmetrics -r CCHHHHHCCC -p CCCHHHHHCC
+Calculate mutational metrics
+Usage: ./ssmetrics mutational [OPTIONS]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -r,--reference TEXT x 2     Reference consensus and mutated sequences (Add -f for fasta files)
+  -p,--predicted TEXT x 2     Predicted consensus and mutated sequences (Add -f for fasta files)
+  -m,--metric TEXT REQUIRED   Name of the metric to calculate.
+                              Metric Choices: Accuracy, Consistency, Precision
+  -l,--lambda FLOAT           Adjustable scale parameter for SOVrefine in MutationPrecision calculation
+  -z,--zeroDelta              This will omit the delta value (delta = 0) in MutationPrecision calculation
+  -s,--subMetric TEXT         Sub-metric to utilize in the calculation of the mutational metric.
+                              Choices for consistency: Binary metrics. Choices for precision: 2d metrics
+```
+
+The binary statistics sub-module accessed by the `binary` subcommand:
+
+```
+Calculate two-class statistical metrics
+Usage: ./ssmetrics binary [OPTIONS]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -r,--reference TEXT REQUIRED
+                              Reference sequence (Add -f for fasta files)
+  -p,--predicted TEXT REQUIRED
+                              Predicted sequence (Add -f for fasta files)
+  -m,--metric TEXT            Name of the metric to calculate. Ignore to calculate all metrics.
+                              Metric Choices: Accuracy, Sensitivity, Specificity, PPV, NPV, FPR, FNR, FOR, FDR, MCC
+  -c,--class CHAR REQUIRED    Positive class in your binary classification problem
+```
+
+## Example
+
+To calculated all secondary structure metrics, you can use the following command:
+
+```
+./ssmetrics 2d -r CCHHHHHCCC -p CCCHHHHHCC
+```
+
+If using fasta files, add the fasta (`-f`) option before a subcommand. The previous command would change into:
+
+```
+./ssmetrics -f 2d -r CCHHHHHCCC -p CCCHHHHHCC
 ```
 
 # Validation
