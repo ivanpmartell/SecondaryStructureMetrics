@@ -7,10 +7,10 @@ bool Sov94::GetZeroDelta() const
     return _zeroDelta;
 }
 
-int Sov94::Delta(const OverlapBlock& overlapBlock) {
+int64_t Sov94::Delta(const OverlapBlock& overlapBlock) {
     if (GetZeroDelta())
         return 0;
-    vector<int> choices = {
+    vector<int64_t> choices = {
         overlapBlock.GetLength() - OverlapLength(overlapBlock),
         OverlapLength(overlapBlock),
         overlapBlock.refRegion.GetLength() / 2 };

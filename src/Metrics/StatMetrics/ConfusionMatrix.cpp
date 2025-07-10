@@ -46,19 +46,19 @@ ConfusionMatrix::ConfusionMatrix(const string& reference, const string& predicte
     }
 }
 
-int ConfusionMatrix::GetTP() const {
+size_t ConfusionMatrix::GetTP() const {
     return _truePositives;
 }
 
-int ConfusionMatrix::GetFP() const {
+size_t ConfusionMatrix::GetFP() const {
     return _falsePositives;
 }
 
-int ConfusionMatrix::GetTN() const {
+size_t ConfusionMatrix::GetTN() const {
     return _trueNegatives;
 }
 
-int ConfusionMatrix::GetFN() const {
+size_t ConfusionMatrix::GetFN() const {
     return _falseNegatives;
 }
 

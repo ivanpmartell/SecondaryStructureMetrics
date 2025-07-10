@@ -5,16 +5,16 @@
 struct Region
 {
 private:
-    int _from{-1};
-    int _to{0};
-    int _length{0};
+    int64_t _from{-1};
+    int64_t _to{0};
+    int64_t _length{0};
 
 public:
-    int GetTo() const;
-    void SetTo(const int& to);
+    int64_t GetTo() const;
+    void SetTo(const int64_t& to);
 
-    int GetFrom() const;
-    void SetFrom(const int& from);
+    int64_t GetFrom() const;
+    void SetFrom(const int64_t& from);
 
-    int GetLength() const;
+    int64_t GetLength() const;
 };

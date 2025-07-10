@@ -8,7 +8,7 @@ private:
     char _ssClass{' '};
 public:
     SSBlock() = default;
-    SSBlock(const int& from, const int& to, const char& secondaryStructure);
+    SSBlock(const int64_t& from, const int64_t& to, const char& secondaryStructure);
 
     char GetSecondaryStructure() const;
 };

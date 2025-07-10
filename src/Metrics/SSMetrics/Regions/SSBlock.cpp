@@ -2,7 +2,7 @@
 
 using namespace std;
 
-SSBlock::SSBlock(const int& from, const int& to, const char& secondaryStructure)
+SSBlock::SSBlock(const int64_t& from, const int64_t& to, const char& secondaryStructure)
 {
     SetFrom(from);
     SetTo(to);

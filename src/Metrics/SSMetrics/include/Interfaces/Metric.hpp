@@ -12,20 +12,20 @@ public:
     unordered_map<char, double> partialComputation;
 
     string& GetName();
-    int GetRefLength();
-    int GetPredLength();
+    int64_t GetRefLength();
+    int64_t GetPredLength();
     vector<SSBlock>& GetRefBlocks();
     vector<SSBlock>& GetPredBlocks();
     unordered_set<char>& GetSecondaryStructureClasses();
 
-    int GetRefLength(const char& secondaryStructure);
+    int64_t GetRefLength(const char& secondaryStructure);
     vector<OverlapBlock>& GetOverlappingBlocks(const char& secondaryStructure);
     vector<SSBlock>& GetNonOverlappingBlocks(const char& secondaryStructure);
     bool HasOverlappingBlocks(const char& secondaryStructure);
     bool HasNonOverlappingBlocks(const char& secondaryStructure);
     double GetPartialComputation(const char& secondaryStructure);
 
-    int OverlapLength(const OverlapBlock& overlapBlock);
+    int64_t OverlapLength(const OverlapBlock& overlapBlock);
 
     Metric(const string& name, const string& refSequence, const string& predSequence, PrecalculatedMetric* precalculated);
     virtual ~Metric() = default;

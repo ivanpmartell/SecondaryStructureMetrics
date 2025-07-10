@@ -4,7 +4,7 @@ using namespace std;
 
 double LooseOverlap::Theta(const OverlapBlock& overlapBlock, const char& secondaryStructure)
 {
-    int overlapCount = OverlapLength(overlapBlock);
+    int64_t overlapCount = OverlapLength(overlapBlock);
     if (secondaryStructure != 'C')
     {
         if (overlapCount >= ceil(overlapBlock.refRegion.GetLength() / 2.0))

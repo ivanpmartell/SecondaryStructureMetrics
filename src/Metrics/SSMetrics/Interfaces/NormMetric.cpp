@@ -1,6 +1,6 @@
 #include "../include/Interfaces/NormMetric.hpp"
 
-int NormMetric::GetNormalizationSum() const
+int64_t NormMetric::GetNormalizationSum() const
 {
     if (normPrecalculations != nullptr) {
         return normPrecalculations->_GetNormalizationSum();
@@ -8,7 +8,7 @@ int NormMetric::GetNormalizationSum() const
     return _GetNormalizationSum();
 }
 
-int NormMetric::GetNormalization(const char& secondaryStructure)
+int64_t NormMetric::GetNormalization(const char& secondaryStructure)
 {
     if (normPrecalculations != nullptr) {
         return normPrecalculations->_GetNormalization(secondaryStructure);

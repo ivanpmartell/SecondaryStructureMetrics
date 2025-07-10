@@ -17,9 +17,9 @@ double StrictOverlap::DeltaSov(const OverlapBlock& overlapBlock) {
     return *min_element(choices.begin(), choices.end());
 }
 
-int StrictOverlap::DeltaStrict(const OverlapBlock& overlapBlock)
+int64_t StrictOverlap::DeltaStrict(const OverlapBlock& overlapBlock)
 {
-    int refBlockLen = overlapBlock.refRegion.GetLength();
+    int64_t refBlockLen = overlapBlock.refRegion.GetLength();
     if (refBlockLen <= 5)
         return 1;
     else if (refBlockLen <= 10)

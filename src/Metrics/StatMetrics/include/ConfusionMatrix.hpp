@@ -7,20 +7,20 @@
 class ConfusionMatrix
 {
 private:
-    int _truePositives{0};
-    int _trueNegatives{0};
-    int _falsePositives{0};
-    int _falseNegatives{0};
+    size_t _truePositives{0};
+    size_t _trueNegatives{0};
+    size_t _falsePositives{0};
+    size_t _falseNegatives{0};
 
     char _posClass;
     char _negClass;
 public:
     ConfusionMatrix(const std::string& reference, const std::string& predicted, const char positiveClass);
 
-    int GetTP() const;
-    int GetFP() const;
-    int GetTN() const;
-    int GetFN() const;
+    size_t GetTP() const;
+    size_t GetFP() const;
+    size_t GetTN() const;
+    size_t GetFN() const;
 
     char GetPosClass() const;
     char GetNegClass() const;

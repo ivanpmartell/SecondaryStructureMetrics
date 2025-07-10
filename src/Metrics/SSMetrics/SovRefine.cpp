@@ -21,7 +21,7 @@ double SovRefine::Delta(const OverlapBlock& overlapBlock) {
     if (GetZeroDelta())
         return 0;
     double deltaVal = GetDeltaAll() * (overlapBlock.refRegion.GetLength() / (double)GetRefLength()) * (OverlapLength(overlapBlock) / (double)overlapBlock.GetLength());
-    int threshold = overlapBlock.GetLength() - OverlapLength(overlapBlock);
+    int64_t threshold = overlapBlock.GetLength() - OverlapLength(overlapBlock);
     if (deltaVal > threshold) { 
         return threshold;
     }

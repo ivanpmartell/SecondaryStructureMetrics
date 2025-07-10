@@ -10,7 +10,7 @@ string& Metric::GetName()
     return _name;
 }
 
-int Metric::GetRefLength()
+int64_t Metric::GetRefLength()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetRefLength();
@@ -18,7 +18,7 @@ int Metric::GetRefLength()
     return _GetRefLength();
 }
 
-int Metric::GetPredLength()
+int64_t Metric::GetPredLength()
 {
     if (precalculations != nullptr) {
         return precalculations->_GetPredLength();
@@ -34,7 +34,7 @@ unordered_set<char>& Metric::GetSecondaryStructureClasses()
     return _GetSecondaryStructureClasses();
 }
 
-int Metric::GetRefLength(const char& secondaryStructure)
+int64_t Metric::GetRefLength(const char& secondaryStructure)
 {
     if (precalculations != nullptr) {
         return precalculations->_GetRefLength(secondaryStructure);
@@ -99,7 +99,7 @@ double Metric::GetPartialComputation(const char& secondaryStructure)
 }
 
 
-int Metric::OverlapLength(const OverlapBlock& overlapBlock)
+int64_t Metric::OverlapLength(const OverlapBlock& overlapBlock)
 {
     if (precalculations != nullptr) {
         return precalculations->_OverlapLength(overlapBlock);

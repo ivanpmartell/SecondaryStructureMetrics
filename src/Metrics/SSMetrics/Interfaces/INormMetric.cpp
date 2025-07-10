@@ -6,23 +6,23 @@ INormMetric::INormMetric(const string& name, const string& refSequence, const st
     if (!calculateNorm)
         return;
     for (const auto& secondaryStructure : GetSecondaryStructureClasses()) {
-        int normalizationValue = N(secondaryStructure);
+        int64_t normalizationValue = N(secondaryStructure);
         this->_nSum += normalizationValue;
         this->_normalizationSSMap.try_emplace(secondaryStructure, normalizationValue);
     }
 }
 
-int INormMetric::_GetNormalizationSum() const {
+int64_t INormMetric::_GetNormalizationSum() const {
     return _nSum;
 }
 
-int INormMetric::_GetNormalization(const char& secondaryStructure) {
+int64_t INormMetric::_GetNormalization(const char& secondaryStructure) {
     return _normalizationSSMap[secondaryStructure];
 }
 
 
-int INormMetric::N(const char& secondaryStructure) {
-    int summation = 0;
+int64_t INormMetric::N(const char& secondaryStructure) {
+    int64_t summation = 0;
     if (HasOverlappingBlocks(secondaryStructure)) {
         for (const auto& block : GetOverlappingBlocks(secondaryStructure)) {
             summation += block.refRegion.GetLength();
