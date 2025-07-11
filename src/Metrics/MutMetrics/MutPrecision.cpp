@@ -6,7 +6,7 @@ string MutPrecision::CreateResultingSequence(const string& consensusSequence, co
         throw runtime_error("Consensus and mutated sequences are not the same length");
     }
     result.reserve(consensusSequence.size() * 2);
-    for (unsigned long long i = 0; i < consensusSequence.size(); i++) {
+    for (size_t i = 0; i < consensusSequence.size(); i++) {
         string interlaced{consensusSequence[i], mutatedSequence[i]};
         result += interlaced;
     }

@@ -124,10 +124,15 @@ static void RunMutation(const string& metricName, const string& consensusRef, co
     for (MutMetric* metricPtr : calculatedMetrics) {
         MutMetric& metric = *metricPtr;
         string& mName = metric.GetName();
-        if (subMetric != "") {
-            mName += "-" + subMetric;
+        string lowercaseSubMetric;
+        lowercaseSubMetric.reserve(subMetric.size());
+        for (size_t i = 0; i < subMetric.size(); ++i) {
+            lowercaseSubMetric += std::tolower(static_cast<unsigned char>(subMetric[i]));
         }
-        fmt::print("{0}\t{1:.3f}\n", mName, metric.Calculate(subMetric));
+        if (lowercaseSubMetric != "") {
+            mName += "-" + lowercaseSubMetric;
+        }
+        fmt::print("{0}\t{1:.3f}\n", mName, metric.Calculate(lowercaseSubMetric));
         fmt::print(">{0}\n{1}\n", "Resulting Reference sequence", metric.GetResultingRefSequence());
         fmt::print(">{0}\n{1}\n", "Resulting Prediction sequence", metric.GetResultingPredSequence());
         delete metricPtr;

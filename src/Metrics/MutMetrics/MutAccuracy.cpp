@@ -5,7 +5,7 @@ vector<string> MutAccuracy::CreateResultingSequence(const string& consensusSeque
     if (consensusSequence.length() != mutatedSequence.length()) {
         throw runtime_error("Consensus and mutated sequences are not the same length");
     }
-    for (unsigned long long i = 0; i < consensusSequence.size(); i++) {
+    for (size_t i = 0; i < consensusSequence.size(); i++) {
         string interlaced{consensusSequence[i], mutatedSequence[i]};
         resultArray.emplace_back(interlaced);
     }

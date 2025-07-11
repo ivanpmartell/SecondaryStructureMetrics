@@ -9,7 +9,7 @@ ConfusionMatrix::ConfusionMatrix(const string& reference, const string& predicte
     if (reference.length() != predicted.length()) {
         throw runtime_error("Reference and predicted sequences are not the same length");
     }
-    for (unsigned long long i = 0; i < reference.size(); i++) {
+    for (size_t i = 0; i < reference.size(); i++) {
         char refClass = reference[i];
         char predClass = predicted[i];
         if (classes.contains(refClass))
